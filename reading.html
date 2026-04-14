@@ -609,7 +609,7 @@ body {
     timerInterval: null,
     rsvpTimer: null,
     rsvpGroups: [],
-    rsvpAvgLen: 5,
+    rsvpAvgCharPerWord: 5,
     rsvpIdx: 0,
     rsvpPlaying: false,
     rsvpPlayedMs: 0
@@ -870,9 +870,11 @@ body {
       }
     }
     if (buf) groups.push(buf);
-    const totalLen = groups.reduce((a, g) => a + g.length, 0);
-    const avgLen = groups.length > 0 ? totalLen / groups.length : 5;
-    return { groups, avgLen };
+    // Mean character length per WORD (letters only, no spaces).
+    // Used so the length factor is calibrated against this particular text.
+    const totalChars = words.reduce((a, w) => a + w.length, 0);
+    const avgCharPerWord = words.length > 0 ? totalChars / words.length : 5;
+    return { groups, avgCharPerWord };
   }
 
   function startRsvpMode() {
@@ -880,7 +882,7 @@ body {
     game.tokens = tokenize(t.text);
     const built = buildRsvpGroups(game.tokens);
     game.rsvpGroups = built.groups;
-    game.rsvpAvgLen = built.avgLen;
+    game.rsvpAvgCharPerWord = built.avgCharPerWord;
     game.rsvpIdx = 0;
     game.rsvpPlaying = false;
     game.rsvpPlayedMs = 0;
@@ -900,14 +902,21 @@ body {
     scheduleRsvpTick();
   }
 
-  // Frame duration is proportional to the word length so that long words
-  // ("большая-пребольшая") are shown longer than short ones ("и"/"на"),
-  // while the average rate stays at the configured WPM.
+  // Frame duration is proportional to the total character length of the group,
+  // calibrated against the text's average word length — so long words linger
+  // and short ones pass quickly, while the mean rate stays at the configured WPM.
+  // A floor keeps short words readable (a word can't show faster than 45% of
+  // its "fair share" of the base word time).
   function computeFrameMs(groupText) {
-    const len = groupText ? groupText.length : 5;
-    const avgLen = game.rsvpAvgLen || 5;
+    if (!groupText) return 60000 / state.wpm;
     const baseMs = 60000 / state.wpm;
-    return Math.max(40, baseMs * len / avgLen);
+    const avgCharPerWord = game.rsvpAvgCharPerWord || 5;
+    // Count chars excluding the joining space between grouped short words.
+    const charCount = groupText.replace(/\s+/g, '').length;
+    const wordCount = groupText.split(/\s+/).filter(Boolean).length || 1;
+    const proportional = baseMs * (charCount / avgCharPerWord);
+    const minFloor = baseMs * 0.45 * wordCount;
+    return Math.max(minFloor, proportional);
   }
 
   function scheduleRsvpTick() {
