@@ -607,11 +607,12 @@ body {
     startTime: 0, endTime: 0,
     durationMs: 60000,
     timerInterval: null,
-    rsvpInterval: null,
+    rsvpTimer: null,
     rsvpGroups: [],
+    rsvpAvgLen: 5,
     rsvpIdx: 0,
     rsvpPlaying: false,
-    rsvpStartTime: 0
+    rsvpPlayedMs: 0
   };
 
   function loadSettings() {
@@ -638,12 +639,31 @@ body {
 
   // ─── Helpers ────────────────────────────
   const LETTER_RE = /[а-яёА-ЯЁa-zA-Z]/;
-  const isWord = t => LETTER_RE.test(t);
-  function tokenize(text) { return text.split(/\s+/).filter(Boolean); }
-  function countWords(text) { return tokenize(text).filter(isWord).length; }
+  // Tokens are objects: { text, isWord, afterSep }
+  // Words joined by a "-" are split into separate words; the hyphen is kept
+  // as its own non-word token without surrounding spaces so rendering stays "a-b".
+  function tokenize(text) {
+    const out = [];
+    const words = text.split(/\s+/).filter(Boolean);
+    for (let i = 0; i < words.length; i++) {
+      const w = words[i];
+      if (w.includes('-')) {
+        const parts = w.split(/(-)/).filter(s => s.length > 0);
+        for (const p of parts) {
+          if (p === '-') out.push({ text: '-', isWord: false, afterSep: '' });
+          else out.push({ text: p, isWord: LETTER_RE.test(p), afterSep: '' });
+        }
+      } else {
+        out.push({ text: w, isWord: LETTER_RE.test(w), afterSep: '' });
+      }
+      if (i < words.length - 1) out[out.length - 1].afterSep = ' ';
+    }
+    return out;
+  }
+  function countWords(text) { return tokenize(text).filter(t => t.isWord).length; }
   function wordsReadUpTo(i) {
     let n = 0;
-    for (let j = 0; j <= i; j++) if (isWord(game.tokens[j])) n++;
+    for (let j = 0; j <= i; j++) if (game.tokens[j].isWord) n++;
     return n;
   }
 
@@ -768,17 +788,17 @@ body {
     if (!game.startTime) return;
     clearInterval(game.timerInterval);
     game.endTime = Date.now();
-    const totalWords = game.tokens.filter(isWord).length;
+    const totalWords = game.tokens.filter(t => t.isWord).length;
     showResult(totalWords, (game.endTime - game.startTime) / 1000);
   };
 
   function renderReadingText(el, clickable) {
     el.innerHTML = '';
-    game.tokens.forEach((w, i) => {
-      if (isWord(w)) {
+    game.tokens.forEach((t, i) => {
+      if (t.isWord) {
         const span = document.createElement('span');
         span.className = 'word';
-        span.textContent = w;
+        span.textContent = t.text;
         if (clickable) {
           span.onclick = () => {
             const wr = wordsReadUpTo(i);
@@ -788,9 +808,9 @@ body {
         }
         el.appendChild(span);
       } else {
-        el.appendChild(document.createTextNode(w));
+        el.appendChild(document.createTextNode(t.text));
       }
-      el.appendChild(document.createTextNode(' '));
+      if (t.afterSep) el.appendChild(document.createTextNode(t.afterSep));
     });
   }
 
@@ -829,11 +849,12 @@ body {
 
   // ─── RSVP ───────────────────────────────
   function buildRsvpGroups(tokens) {
+    const words = tokens.filter(t => t.isWord).map(t => t.text);
     const groups = [];
     let buf = '';
     const MAX = 16;
-    const short = t => t.length <= 2 && isWord(t);
-    for (const w of tokens) {
+    const short = w => w.length <= 2;
+    for (const w of words) {
       if (buf) {
         if (buf.length + 1 + w.length <= MAX) {
           groups.push(buf + ' ' + w);
@@ -849,16 +870,20 @@ body {
       }
     }
     if (buf) groups.push(buf);
-    return groups;
+    const totalLen = groups.reduce((a, g) => a + g.length, 0);
+    const avgLen = groups.length > 0 ? totalLen / groups.length : 5;
+    return { groups, avgLen };
   }
 
   function startRsvpMode() {
     const t = getCurrentText();
     game.tokens = tokenize(t.text);
-    game.rsvpGroups = buildRsvpGroups(game.tokens);
+    const built = buildRsvpGroups(game.tokens);
+    game.rsvpGroups = built.groups;
+    game.rsvpAvgLen = built.avgLen;
     game.rsvpIdx = 0;
     game.rsvpPlaying = false;
-    game.rsvpStartTime = 0;
+    game.rsvpPlayedMs = 0;
     $('rsvpTitle').textContent = t.title;
     $('rsvpProgress').textContent = `0 / ${game.rsvpGroups.length}`;
     $('rsvpWpm').textContent = state.wpm;
@@ -871,27 +896,36 @@ body {
 
   function startRsvpPlayback() {
     game.rsvpPlaying = true;
-    game.rsvpStartTime = Date.now();
     $('rsvpPlay').textContent = '⏸';
     scheduleRsvpTick();
   }
 
-  function scheduleRsvpTick() {
-    clearInterval(game.rsvpInterval);
-    const interval = Math.max(50, 60000 / state.wpm);
-    game.rsvpInterval = setInterval(() => {
-      if (!game.rsvpPlaying) return;
-      rsvpTick();
-    }, interval);
+  // Frame duration is proportional to the word length so that long words
+  // ("большая-пребольшая") are shown longer than short ones ("и"/"на"),
+  // while the average rate stays at the configured WPM.
+  function computeFrameMs(groupText) {
+    const len = groupText ? groupText.length : 5;
+    const avgLen = game.rsvpAvgLen || 5;
+    const baseMs = 60000 / state.wpm;
+    return Math.max(40, baseMs * len / avgLen);
   }
 
-  function rsvpTick() {
-    game.rsvpIdx++;
-    if (game.rsvpIdx >= game.rsvpGroups.length) {
-      finishRsvp();
-      return;
-    }
-    renderRsvpFrame();
+  function scheduleRsvpTick() {
+    clearTimeout(game.rsvpTimer);
+    if (!game.rsvpPlaying) return;
+    const g = game.rsvpGroups[game.rsvpIdx];
+    if (!g) { finishRsvp(); return; }
+    const ms = computeFrameMs(g);
+    game.rsvpTimer = setTimeout(() => {
+      game.rsvpPlayedMs += ms;
+      game.rsvpIdx++;
+      if (game.rsvpIdx >= game.rsvpGroups.length) {
+        finishRsvp();
+        return;
+      }
+      renderRsvpFrame();
+      scheduleRsvpTick();
+    }, ms);
   }
 
   function renderRsvpFrame() {
@@ -902,18 +936,19 @@ body {
   }
 
   function finishRsvp() {
-    clearInterval(game.rsvpInterval);
+    clearTimeout(game.rsvpTimer);
     game.rsvpPlaying = false;
-    const totalMs = Date.now() - game.rsvpStartTime;
-    const totalWords = game.tokens.filter(isWord).length;
-    showResult(totalWords, totalMs / 1000);
+    const totalSec = game.rsvpPlayedMs / 1000;
+    const totalWords = game.tokens.filter(t => t.isWord).length;
+    showResult(totalWords, totalSec);
   }
 
   $('rsvpPlay').onclick = () => {
     if (game.rsvpIdx >= game.rsvpGroups.length) return;
     game.rsvpPlaying = !game.rsvpPlaying;
     $('rsvpPlay').textContent = game.rsvpPlaying ? '⏸' : '▶';
-    if (game.rsvpPlaying && !game.rsvpStartTime) game.rsvpStartTime = Date.now();
+    if (game.rsvpPlaying) scheduleRsvpTick();
+    else clearTimeout(game.rsvpTimer);
   };
 
   $('rsvpPrev').onclick = () => {
@@ -945,7 +980,7 @@ body {
 
   function stopAll() {
     clearInterval(game.timerInterval);
-    clearInterval(game.rsvpInterval);
+    clearTimeout(game.rsvpTimer);
     game.rsvpPlaying = false;
     $('countdown').classList.remove('active');
   }
