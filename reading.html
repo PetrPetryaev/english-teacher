@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Тренажёр чтения</title>
+<style>
+:root {
+  --purple: #9C27B0;
+  --purple-light: #f3e5f5;
+  --purple-dark: #6A1B9A;
+  --pink: #e91e8c;
+  --green: #4CAF50;
+  --green-light: #e8f5e9;
+  --orange: #FF9800;
+  --orange-light: #fff3e0;
+  --blue: #2196F3;
+  --blue-light: #e3f2fd;
+  --red: #f44336;
+  --red-light: #ffebee;
+  --bg: #fafafa;
+  --card-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  --radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: #333;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ─── Header ─── */
+.header {
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  color: white;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+}
+.header h1 { font-size: 17px; font-weight: 600; flex: 1; text-align: center; }
+.header .icon-btn {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header .icon-btn.hidden { visibility: hidden; }
+
+/* ─── Screens ─── */
+.screen { display: none; padding: 16px; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+.screen.active { display: block; animation: fadeIn 0.25s; }
+.screen.rsvp-screen { background: #1a1a2e; color: white; max-width: none; margin: 0; padding: 0; min-height: calc(100vh - 64px); flex-direction: column; }
+.screen.rsvp-screen.active { display: flex; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #999;
+  margin: 22px 0 10px 4px;
+  font-weight: 600;
+}
+.section-title:first-child { margin-top: 4px; }
+
+/* ─── Levels ─── */
+.levels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.level-btn {
+  background: white;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 16px 0;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  transition: all 0.15s;
+  color: #333;
+}
+.level-btn.active {
+  background: var(--purple);
+  color: white;
+  transform: scale(1.04);
+}
+
+/* ─── Text list ─── */
+.text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.text-item {
+  background: white;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s;
+}
+.text-item.active {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple-dark);
+}
+.text-item .title { font-weight: 600; font-size: 15px; }
+.text-item .meta { font-size: 12px; opacity: 0.7; }
+
+/* ─── Mode cards ─── */
+.mode-card {
+  display: block;
+  background: white;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  box-shadow: var(--card-shadow);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+}
+.mode-card.active {
+  border-color: var(--purple);
+  background: var(--purple-light);
+}
+.mode-card .mode-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.mode-card .mode-desc {
+  font-size: 13px;
+  color: #666;
+}
+
+/* ─── Big buttons ─── */
+.big-btn {
+  display: block;
+  width: 100%;
+  padding: 17px;
+  margin-top: 16px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(156, 39, 176, 0.25);
+}
+.big-btn:active { transform: scale(0.98); }
+.big-btn.green {
+  background: linear-gradient(135deg, var(--green), #2E7D32);
+  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25);
+}
+.big-btn.first { margin-top: 24px; }
+
+/* ─── WPM picker ─── */
+.wpm-picker {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  padding: 12px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+}
+.wpm-picker button {
+  width: 44px; height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.wpm-picker button:active { transform: scale(0.95); }
+.wpm-display-small {
+  flex: 1;
+  text-align: center;
+}
+.wpm-display-small b {
+  font-size: 28px;
+  color: var(--purple);
+  font-weight: 700;
+  display: block;
+}
+.wpm-display-small span {
+  font-size: 11px;
+  font-weight: 500;
+  color: #999;
+  text-transform: uppercase;
+}
+
+/* ─── Countdown ─── */
+.countdown-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(106, 27, 154, 0.92);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+.countdown-overlay.active { display: flex; }
+.countdown-num {
+  font-size: 180px;
+  color: white;
+  font-weight: 700;
+  animation: countPulse 1s ease-out;
+}
+@keyframes countPulse {
+  0% { transform: scale(1.5); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.4; }
+}
+
+/* ─── Timer bar ─── */
+.timer-bar {
+  position: sticky;
+  top: 64px;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 16px;
+  margin: 0 0 16px;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 50;
+}
+.timer-val {
+  font-size: 30px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--purple);
+  line-height: 1;
+}
+.timer-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+  margin-top: 2px;
+}
+.timer-bar button {
+  padding: 10px 16px;
+  background: var(--orange);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.reading-text {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px 22px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  line-height: 1.85;
+  box-shadow: var(--card-shadow);
+  color: #222;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.reading-text .word {
+  cursor: default;
+  padding: 1px 2px;
+  border-radius: 4px;
+}
+.reading-text.pickable .word { cursor: pointer; }
+.reading-text.pickable .word:active { background: var(--orange); color: white; }
+.reading-text.pickable .word:hover { background: var(--orange-light); }
+
+.tip {
+  background: var(--purple-light);
+  color: var(--purple-dark);
+  padding: 11px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+/* ─── RSVP ─── */
+.rsvp-topbar {
+  padding: 14px 16px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.25);
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  font-weight: 500;
+}
+.rsvp-progress {
+  height: 4px;
+  background: rgba(255,255,255,0.15);
+  overflow: hidden;
+}
+.rsvp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--pink));
+  transition: width 0.1s;
+  width: 0;
+}
+.rsvp-center {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  min-height: 55vh;
+}
+.rsvp-prev, .rsvp-next {
+  position: absolute;
+  font-size: 18px;
+  color: rgba(255,255,255,0.28);
+  padding: 10px;
+  font-family: Georgia, serif;
+  max-width: 28%;
+}
+.rsvp-prev { left: 6px; text-align: right; }
+.rsvp-next { right: 6px; text-align: left; }
+.rsvp-current {
+  font-family: Georgia, serif;
+  font-size: 46px;
+  font-weight: 600;
+  text-align: center;
+  padding: 0 20px;
+  letter-spacing: 0.3px;
+  color: white;
+  min-height: 60px;
+}
+.rsvp-controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 18px 14px;
+  gap: 8px;
+  background: rgba(0,0,0,0.25);
+}
+.rsvp-controls .btn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: white;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.rsvp-controls .btn:active { transform: scale(0.95); }
+.rsvp-controls .play-btn {
+  background: var(--purple);
+  width: 68px; height: 68px;
+  font-size: 26px;
+}
+.rsvp-wpm {
+  font-weight: 700;
+  min-width: 86px;
+  text-align: center;
+  color: white;
+}
+.rsvp-wpm b { font-size: 22px; display: block; }
+.rsvp-wpm span {
+  font-size: 10px;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* ─── Results ─── */
+.result-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 12px;
+}
+.result-emoji { font-size: 72px; margin-bottom: 6px; }
+.result-title { font-size: 23px; font-weight: 700; margin-bottom: 18px; color: #333; }
+.wpm-display {
+  background: linear-gradient(135deg, var(--purple-light), white);
+  padding: 22px;
+  border-radius: 16px;
+  margin-bottom: 14px;
+}
+.wpm-value {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--purple);
+  line-height: 1;
+}
+.wpm-label {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.result-stat {
+  padding: 14px;
+  background: var(--purple-light);
+  border-radius: 12px;
+}
+.result-stat-value { font-size: 24px; font-weight: 700; color: var(--purple-dark); }
+.result-stat-label { font-size: 11px; color: #666; margin-top: 2px; }
+.grade-box {
+  padding: 14px;
+  border-radius: 12px;
+  margin-top: 14px;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.grade-box.good { background: var(--green-light); color: #1B5E20; }
+.grade-box.ok { background: var(--orange-light); color: #E65100; }
+.grade-box.need { background: var(--blue-light); color: #0D47A1; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <button class="icon-btn" id="backBtn">←</button>
+  <h1 id="headerTitle">Тренажёр чтения</h1>
+  <button class="icon-btn hidden" id="rightBtn"></button>
+</div>
+
+<!-- ─── MENU ─── -->
+<div class="screen active" id="screen-menu">
+  <div class="section-title">Выбери класс</div>
+  <div class="levels" id="levelButtons"></div>
+
+  <div class="section-title">Текст</div>
+  <div class="text-list" id="textList"></div>
+
+  <div class="section-title">Режим</div>
+  <button class="mode-card active" data-mode="timer" type="button">
+    <div class="mode-title">📖 Чтение с таймером</div>
+    <div class="mode-desc">Читай минуту — узнай свою скорость в словах в минуту.</div>
+  </button>
+  <button class="mode-card" data-mode="rsvp" type="button">
+    <div class="mode-title">⚡ Ускоритель</div>
+    <div class="mode-desc">Слова появляются по одному. Скорость можно менять во время чтения.</div>
+  </button>
+
+  <div id="wpmSection" style="display: none;">
+    <div class="section-title">Стартовая скорость</div>
+    <div class="wpm-picker">
+      <button id="wpmMinus" type="button">−</button>
+      <div class="wpm-display-small"><b id="wpmStart">120</b><span>слов/мин</span></div>
+      <button id="wpmPlus" type="button">+</button>
+    </div>
+  </div>
+
+  <button class="big-btn first" id="startBtn">🚀 Начать</button>
+</div>
+
+<!-- ─── COUNTDOWN overlay ─── -->
+<div class="countdown-overlay" id="countdown"><div class="countdown-num" id="countdownNum">3</div></div>
+
+<!-- ─── TIMER reading ─── -->
+<div class="screen" id="screen-timer">
+  <div class="timer-bar">
+    <div>
+      <div class="timer-val" id="timerVal">01:00</div>
+      <div class="timer-label">Осталось</div>
+    </div>
+    <button id="doneBtn" type="button">Я закончил!</button>
+  </div>
+  <div class="reading-text" id="readingText"></div>
+</div>
+
+<!-- ─── PICKER (after timer) ─── -->
+<div class="screen" id="screen-picker">
+  <div class="tip">👆 Тапни на слово, на котором ты остановился.</div>
+  <div class="reading-text pickable" id="readingTextPickable"></div>
+</div>
+
+<!-- ─── RSVP ─── -->
+<div class="screen rsvp-screen" id="screen-rsvp">
+  <div class="rsvp-topbar">
+    <div id="rsvpProgress">0 / 0</div>
+    <div id="rsvpTitle"></div>
+  </div>
+  <div class="rsvp-progress"><div class="rsvp-progress-fill" id="rsvpProgFill"></div></div>
+  <div class="rsvp-center">
+    <div class="rsvp-prev" id="rsvpPrev"></div>
+    <div class="rsvp-current" id="rsvpCurrent">Готов?</div>
+    <div class="rsvp-next" id="rsvpNext"></div>
+  </div>
+  <div class="rsvp-controls">
+    <button class="btn" id="rsvpMinus" type="button">−</button>
+    <div class="rsvp-wpm"><b id="rsvpWpm">120</b><span>слов/мин</span></div>
+    <button class="btn play-btn" id="rsvpPlay" type="button">⏸</button>
+    <button class="btn" id="rsvpPlus" type="button">+</button>
+  </div>
+</div>
+
+<!-- ─── RESULTS ─── -->
+<div class="screen" id="screen-results">
+  <div class="result-card">
+    <div class="result-emoji" id="resEmoji">🎉</div>
+    <div class="result-title" id="resTitle">Молодец!</div>
+    <div class="wpm-display">
+      <div class="wpm-value" id="resWpm">0</div>
+      <div class="wpm-label">слов в минуту</div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat">
+        <div class="result-stat-value" id="resWords">0</div>
+        <div class="result-stat-label">слов прочитано</div>
+      </div>
+      <div class="result-stat">
+        <div class="result-stat-value" id="resTime">0</div>
+        <div class="result-stat-label">секунд</div>
+      </div>
+    </div>
+    <div class="grade-box" id="gradeBox"></div>
+  </div>
+  <button class="big-btn" id="restartBtn">🔁 Ещё раз</button>
+  <button class="big-btn green" id="menuBtn">🏠 В меню</button>
+</div>
+
+<script>
+(function(){
+  // ─── Texts ──────────────────────────────
+  const TEXTS = {
+    1: [
+      { title: 'Осенью в лесу', text: 'Пришла осень. Листья стали жёлтыми и красными. Ветер сорвал их с деревьев. Они летят по небу как птицы. Белка собирает орехи. Заяц меняет шубку на белую. Медведь ест ягоды и готовится ко сну. В лесу тихо.' },
+      { title: 'Новый друг', text: 'Во дворе Лиза нашла щенка. Он был маленький и мокрый. Девочка принесла его домой. Мама вытерла щенка полотенцем. Папа налил ему молока. Щенок стал вилять хвостом. Лиза решила назвать его Шарик. Теперь у неё есть друг.' },
+      { title: 'День рождения', text: 'У кота Мурзика сегодня день рождения. Ему исполнился год. Мама подарила ему рыбу. Папа купил игрушечную мышку. А бабушка связала тёплый носок. Мурзик залез в носок и уснул. Ему снилось, что он король всех кошек на свете.' },
+    ],
+    2: [
+      { title: 'Муравей и голубка', text: 'Муравей спустился к ручью: захотел напиться. Волна захлестнула его и чуть не потопила. Голубка несла ветку. Она увидела, что муравей тонет, и бросила ему ветку в ручей. Муравей сел на ветку и спасся. Потом охотник расставил силки на голубку и хотел её поймать. Муравей подполз к охотнику и укусил его за ногу. Охотник охнул и уронил силки. Голубка вспорхнула и улетела.' },
+      { title: 'Велосипед', text: 'Летом папа купил мне велосипед. Он был красный, с большими колёсами. Я очень хотел кататься, но боялся упасть. Папа держал велосипед за руль и бежал рядом. Я крутил педали. Однажды папа отпустил руль, а я не заметил. И вдруг понял: я еду сам! Ветер свистел в ушах. Я так обрадовался, что забыл тормозить. Упал в траву, но не заплакал. Теперь я умею кататься на велосипеде!' },
+      { title: 'Лесная школа', text: 'В лесной школе учатся зверята. Лиса учит их хитрости. Медведь рассказывает, где собирать мёд. Белка объясняет, как прятать орехи на зиму. Ёжик показывает грибы. А сова, самая мудрая, учит читать по звёздам. Звонок у них необычный: крик дятла. На перемене зверята играют в салочки. Самая быстрая зайчиха, её никто поймать не может. Все зверята любят свою лесную школу.' },
+    ],
+    3: [
+      { title: 'Котёнок', text: 'Были брат и сестра, Вася и Катя, и у них была кошка. Весной кошка пропала. Дети искали её везде, но не могли найти. Один раз они играли подле амбара и услыхали, что над головой кто-то мяучит тонкими голосами. Вася влез по лестнице под крышу амбара. А Катя стояла внизу и всё спрашивала: «Нашёл? Нашёл?» Но Вася не отвечал. Наконец он закричал: «Нашёл! Наша кошка, и у неё котята. Иди скорее». Катя побежала домой, достала молока и принесла кошке. Котят было пять. Они выросли немного, и дети выбрали себе одного, серого с белыми лапками. Остальных раздали, а этого оставили. Дети кормили его, играли с ним и клали с собой спать.' },
+      { title: 'Мечта о море', text: 'Петя никогда не видел моря. Он жил в маленьком городке далеко от берега. Только на картинках в книжках он видел волны, ракушки и чаек. Мальчик очень хотел побывать у моря. Он представлял, как бежит по мокрому песку и собирает ракушки. Как на горизонте виден корабль с белыми парусами. Как вода солёная, если случайно попадёт в рот. Однажды папа сказал: «Мы поедем летом к морю». Петя не поверил своему счастью. Он считал дни до поездки. И вот они в поезде, а за окном мелькают поля и леса. Через день поезд остановился. Петя выбежал на перрон и услышал чаек. Запахло солью. Его мечта сбывалась!' },
+      { title: 'Помощник в деревне', text: 'Миша приехал на каникулы к бабушке в деревню. Первое утро он проснулся от крика петуха. За окном пели птицы, а на столе уже стояло парное молоко. Бабушка встала рано: надо было покормить кур и подоить корову. Миша решил помочь. Сначала он принёс воды из колодца. Ведро оказалось тяжёлым, но мальчик справился. Потом помогал собирать яйца в курятнике. Одна курица не хотела уходить с гнезда, и бабушка сказала: «Это она хочет цыплят высидеть, не трогай её». Вечером Миша устал, но был очень довольный. Бабушка похвалила его настоящим помощником. Теперь каждое утро мальчик вставал первым. И бабушке было легче.' },
+    ],
+    4: [
+      { title: 'Волшебная палочка', text: 'Однажды Маша нашла на чердаке старый сундук. Внутри лежала странная палочка: тонкая, серебристая, с узорами. «Может, это от старой куклы», подумала девочка. Она взяла палочку в руку и ради шутки произнесла: «Хочу конфету!». В ту же секунду на её ладони появилась большая шоколадная конфета. Маша не поверила своим глазам. Она попробовала ещё: «Хочу, чтобы во дворе распустились розы!» И во дворе расцвели алые цветы. Девочка обрадовалась и побежала показать находку брату. Вдвоём они загадывали разные желания: много игрушек, горы мороженого, большого пушистого котёнка. Но к вечеру комната была завалена вещами, мороженое таяло на полу, а котёнок от страха спрятался под кровать. Мама очень рассердилась. Маша испугалась и загадала последнее желание: «Хочу, чтобы всё исчезло!». Палочка дрогнула, и в комнате снова стало чисто. Но сама палочка тоже исчезла. Утром Маша полезла на чердак: сундук был пуст. Девочка долго искала, но так и не нашла волшебную палочку. Зато она поняла: желания бывают нужными и не очень. И теперь, прежде чем чего-то захотеть, Маша всегда думает дважды.' },
+      { title: 'Зимнее приключение', text: 'Зима в том году выдалась снежная. Сугробы намело выше окон. Ваня давно мечтал сделать настоящий снежный дом, такой, как у эскимосов. С утра он вышел во двор с лопатой. Сначала дело не шло. Снег рассыпался в руках. Но папа помог, принёс ведро воды. Вместе они слепили первые кирпичи. К обеду стена была по пояс Ване. К ужину выше головы. Потом папа сделал крышу из досок и снега. Получилось настоящее иглу. Внутри было тесно, но тепло. Ваня притащил старое одеяло, фонарик и книжку. Он залез в свой дом и стал читать. Снаружи выла метель, а внутри было тихо. Мальчик почувствовал себя настоящим полярником. Вечером мама звала его домой, но Ваня не хотел уходить. Он попросил разрешения пить чай прямо в снежном доме. Мама согласилась, принесла горячий термос и печенье. Никогда ещё чай не казался Ване таким вкусным. В ту ночь он уснул с мыслью: завтра он пригласит друзей, и у них будет настоящая полярная экспедиция.' }
+    ]
+  };
+
+  // Norms (words per minute at end of year — РФ)
+  const NORMS = { 1: 35, 2: 55, 3: 75, 4: 95 };
+  const DEFAULT_WPM = { 1: 60, 2: 90, 3: 120, 4: 150 };
+
+  // ─── State ──────────────────────────────
+  const SAVE_KEY = 'reading-trainer-v1';
+  const defaults = { level: 2, textIndex: 0, mode: 'timer', wpm: 120 };
+  const state = Object.assign({}, defaults, loadSettings());
+
+  const game = {
+    tokens: [],
+    startTime: 0, endTime: 0,
+    durationMs: 60000,
+    timerInterval: null,
+    rsvpInterval: null,
+    rsvpGroups: [],
+    rsvpIdx: 0,
+    rsvpPlaying: false,
+    rsvpStartTime: 0,
+    rsvpElapsedMs: 0
+  };
+
+  function loadSettings() {
+    try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || '{}'); return s || {}; }
+    catch (e) { return {}; }
+  }
+  function saveSettings() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  const $ = id => document.getElementById(id);
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $(id).classList.add('active');
+    const titles = {
+      'screen-menu': 'Тренажёр чтения',
+      'screen-timer': 'Читай!',
+      'screen-picker': 'Где ты остановился?',
+      'screen-rsvp': 'Ускоритель',
+      'screen-results': 'Результат'
+    };
+    $('headerTitle').textContent = titles[id] || 'Тренажёр чтения';
+  }
+
+  // ─── Helpers ────────────────────────────
+  const LETTER_RE = /[а-яёА-ЯЁa-zA-Z]/;
+  const isWord = t => LETTER_RE.test(t);
+  function tokenize(text) { return text.split(/\s+/).filter(Boolean); }
+  function countWords(text) { return tokenize(text).filter(isWord).length; }
+  function wordsReadUpTo(i) {
+    let n = 0;
+    for (let j = 0; j <= i; j++) if (isWord(game.tokens[j])) n++;
+    return n;
+  }
+
+  function getCurrentText() {
+    const list = TEXTS[state.level] || [];
+    return list[state.textIndex] || list[0];
+  }
+
+  // ─── Menu rendering ─────────────────────
+  function renderLevels() {
+    const c = $('levelButtons');
+    c.innerHTML = '';
+    [1, 2, 3, 4].forEach(lv => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'level-btn' + (lv === state.level ? ' active' : '');
+      b.textContent = lv + ' класс';
+      b.onclick = () => {
+        state.level = lv;
+        state.textIndex = 0;
+        state.wpm = DEFAULT_WPM[lv];
+        $('wpmStart').textContent = state.wpm;
+        saveSettings();
+        renderLevels();
+        renderTexts();
+      };
+      c.appendChild(b);
+    });
+  }
+
+  function renderTexts() {
+    const c = $('textList');
+    c.innerHTML = '';
+    (TEXTS[state.level] || []).forEach((t, i) => {
+      const wc = countWords(t.text);
+      const el = document.createElement('div');
+      el.className = 'text-item' + (i === state.textIndex ? ' active' : '');
+      el.innerHTML = `<div class="title">${t.title}</div><div class="meta">${wc} сл.</div>`;
+      el.onclick = () => {
+        state.textIndex = i;
+        saveSettings();
+        renderTexts();
+      };
+      c.appendChild(el);
+    });
+  }
+
+  // Mode toggles
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.onclick = () => {
+      document.querySelectorAll('.mode-card').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+      state.mode = c.dataset.mode;
+      saveSettings();
+      $('wpmSection').style.display = state.mode === 'rsvp' ? 'block' : 'none';
+    };
+  });
+
+  // WPM picker (menu)
+  $('wpmMinus').onclick = () => {
+    state.wpm = Math.max(30, state.wpm - 10);
+    $('wpmStart').textContent = state.wpm;
+    saveSettings();
+  };
+  $('wpmPlus').onclick = () => {
+    state.wpm = Math.min(500, state.wpm + 10);
+    $('wpmStart').textContent = state.wpm;
+    saveSettings();
+  };
+
+  // Start
+  $('startBtn').onclick = () => {
+    if (state.mode === 'timer') startTimerMode();
+    else startRsvpMode();
+  };
+
+  // ─── Countdown ──────────────────────────
+  function countdown(cb) {
+    const overlay = $('countdown');
+    const num = $('countdownNum');
+    overlay.classList.add('active');
+    const seq = ['3', '2', '1', 'Старт!'];
+    let i = 0;
+    const tick = () => {
+      num.textContent = seq[i];
+      num.style.animation = 'none';
+      void num.offsetHeight;
+      num.style.animation = 'countPulse 0.9s ease-out';
+      i++;
+      if (i >= seq.length) {
+        setTimeout(() => { overlay.classList.remove('active'); cb(); }, 700);
+      } else {
+        setTimeout(tick, 900);
+      }
+    };
+    tick();
+  }
+
+  // ─── Timer mode ─────────────────────────
+  function startTimerMode() {
+    const t = getCurrentText();
+    game.tokens = tokenize(t.text);
+    renderReadingText($('readingText'), false);
+    show('screen-timer');
+    countdown(() => {
+      game.startTime = Date.now();
+      game.durationMs = 60000;
+      runTimer();
+    });
+  }
+
+  function runTimer() {
+    clearInterval(game.timerInterval);
+    game.timerInterval = setInterval(() => {
+      const elapsed = Date.now() - game.startTime;
+      const remaining = Math.max(0, game.durationMs - elapsed);
+      const secs = Math.ceil(remaining / 1000);
+      $('timerVal').textContent = '00:' + String(secs).padStart(2, '0');
+      if (remaining === 0) {
+        clearInterval(game.timerInterval);
+        game.endTime = Date.now();
+        goToPicker();
+      }
+    }, 200);
+  }
+
+  $('doneBtn').onclick = () => {
+    if (!game.startTime) return;
+    clearInterval(game.timerInterval);
+    game.endTime = Date.now();
+    const totalWords = game.tokens.filter(isWord).length;
+    showResult(totalWords, (game.endTime - game.startTime) / 1000);
+  };
+
+  function renderReadingText(el, clickable) {
+    el.innerHTML = '';
+    game.tokens.forEach((w, i) => {
+      if (isWord(w)) {
+        const span = document.createElement('span');
+        span.className = 'word';
+        span.textContent = w;
+        if (clickable) {
+          span.onclick = () => {
+            const wr = wordsReadUpTo(i);
+            const elapsedSec = (game.endTime - game.startTime) / 1000;
+            showResult(wr, elapsedSec);
+          };
+        }
+        el.appendChild(span);
+      } else {
+        el.appendChild(document.createTextNode(w));
+      }
+      el.appendChild(document.createTextNode(' '));
+    });
+  }
+
+  function goToPicker() {
+    renderReadingText($('readingTextPickable'), true);
+    show('screen-picker');
+  }
+
+  // ─── Result ─────────────────────────────
+  function showResult(wordsRead, elapsedSec) {
+    if (elapsedSec <= 0) elapsedSec = 0.1;
+    const wpm = Math.round(wordsRead * 60 / elapsedSec);
+    $('resWpm').textContent = wpm;
+    $('resWords').textContent = wordsRead;
+    $('resTime').textContent = Math.round(elapsedSec);
+
+    const norm = NORMS[state.level];
+    const ratio = wpm / norm;
+    let emoji, title, gradeClass, gradeText;
+    if (ratio >= 1.2) {
+      emoji = '🚀'; title = 'Отлично!'; gradeClass = 'good';
+      gradeText = `Выше нормы для ${state.level} класса (${norm} слов/мин). Ты суперчитатель!`;
+    } else if (ratio >= 1) {
+      emoji = '🌟'; title = 'Молодец!'; gradeClass = 'good';
+      gradeText = `Ты читаешь в норме для ${state.level} класса (${norm} слов/мин).`;
+    } else if (ratio >= 0.75) {
+      emoji = '😊'; title = 'Хорошо!'; gradeClass = 'ok';
+      gradeText = `Почти норма ${state.level} класса (${norm} слов/мин). Ещё немного!`;
+    } else {
+      emoji = '💪'; title = 'Тренируйся!'; gradeClass = 'need';
+      gradeText = `Норма ${state.level} класса — ${norm} слов/мин. Продолжай читать каждый день!`;
+    }
+    $('resEmoji').textContent = emoji;
+    $('resTitle').textContent = title;
+    const gb = $('gradeBox');
+    gb.className = 'grade-box ' + gradeClass;
+    gb.textContent = gradeText;
+    show('screen-results');
+  }
+
+  // ─── RSVP ───────────────────────────────
+  function buildRsvpGroups(tokens) {
+    const groups = [];
+    let buf = '';
+    const MAX = 16;
+    const short = t => t.length <= 2 && isWord(t);
+    for (const w of tokens) {
+      if (buf) {
+        if (buf.length + 1 + w.length <= MAX) {
+          groups.push(buf + ' ' + w);
+        } else {
+          groups.push(buf);
+          groups.push(w);
+        }
+        buf = '';
+      } else if (short(w)) {
+        buf = w;
+      } else {
+        groups.push(w);
+      }
+    }
+    if (buf) groups.push(buf);
+    return groups;
+  }
+
+  function startRsvpMode() {
+    const t = getCurrentText();
+    game.tokens = tokenize(t.text);
+    game.rsvpGroups = buildRsvpGroups(game.tokens);
+    game.rsvpIdx = 0;
+    game.rsvpPlaying = false;
+    game.rsvpStartTime = 0;
+    game.rsvpElapsedMs = 0;
+    $('rsvpTitle').textContent = t.title;
+    $('rsvpProgress').textContent = `0 / ${game.rsvpGroups.length}`;
+    $('rsvpWpm').textContent = state.wpm;
+    $('rsvpCurrent').textContent = game.rsvpGroups[0] || '';
+    $('rsvpPrev').textContent = '';
+    $('rsvpNext').textContent = game.rsvpGroups[1] || '';
+    $('rsvpProgFill').style.width = '0%';
+    $('rsvpPlay').textContent = '⏸';
+    show('screen-rsvp');
+    countdown(() => { startRsvpPlayback(); });
+  }
+
+  function startRsvpPlayback() {
+    game.rsvpPlaying = true;
+    game.rsvpStartTime = Date.now();
+    $('rsvpPlay').textContent = '⏸';
+    scheduleRsvpTick();
+  }
+
+  function scheduleRsvpTick() {
+    clearInterval(game.rsvpInterval);
+    const interval = 60000 / state.wpm;
+    game.rsvpInterval = setInterval(() => {
+      if (!game.rsvpPlaying) return;
+      rsvpTick();
+    }, interval);
+  }
+
+  function rsvpTick() {
+    game.rsvpIdx++;
+    if (game.rsvpIdx >= game.rsvpGroups.length) {
+      finishRsvp();
+      return;
+    }
+    renderRsvpFrame();
+  }
+
+  function renderRsvpFrame() {
+    const g = game.rsvpGroups, i = game.rsvpIdx;
+    $('rsvpCurrent').textContent = g[i] || '';
+    $('rsvpPrev').textContent = i > 0 ? g[i - 1] : '';
+    $('rsvpNext').textContent = i < g.length - 1 ? g[i + 1] : '';
+    $('rsvpProgress').textContent = `${Math.min(i + 1, g.length)} / ${g.length}`;
+    $('rsvpProgFill').style.width = ((i + 1) / g.length * 100) + '%';
+  }
+
+  function finishRsvp() {
+    clearInterval(game.rsvpInterval);
+    game.rsvpPlaying = false;
+    const totalMs = Date.now() - game.rsvpStartTime;
+    const totalWords = game.tokens.filter(isWord).length;
+    showResult(totalWords, totalMs / 1000);
+  }
+
+  $('rsvpPlay').onclick = () => {
+    if (game.rsvpIdx >= game.rsvpGroups.length) return;
+    game.rsvpPlaying = !game.rsvpPlaying;
+    $('rsvpPlay').textContent = game.rsvpPlaying ? '⏸' : '▶';
+    if (game.rsvpPlaying && !game.rsvpStartTime) game.rsvpStartTime = Date.now();
+  };
+  $('rsvpMinus').onclick = () => {
+    state.wpm = Math.max(30, state.wpm - 10);
+    $('rsvpWpm').textContent = state.wpm;
+    $('wpmStart').textContent = state.wpm;
+    saveSettings();
+    scheduleRsvpTick();
+  };
+  $('rsvpPlus').onclick = () => {
+    state.wpm = Math.min(500, state.wpm + 10);
+    $('rsvpWpm').textContent = state.wpm;
+    $('wpmStart').textContent = state.wpm;
+    saveSettings();
+    scheduleRsvpTick();
+  };
+
+  // ─── Results buttons ────────────────────
+  $('restartBtn').onclick = () => {
+    if (state.mode === 'timer') startTimerMode();
+    else startRsvpMode();
+  };
+  $('menuBtn').onclick = () => {
+    stopAll();
+    show('screen-menu');
+  };
+
+  function stopAll() {
+    clearInterval(game.timerInterval);
+    clearInterval(game.rsvpInterval);
+    game.rsvpPlaying = false;
+    $('countdown').classList.remove('active');
+  }
+
+  // ─── Back ───────────────────────────────
+  $('backBtn').onclick = () => {
+    stopAll();
+    const active = document.querySelector('.screen.active');
+    if (!active || active.id === 'screen-menu') {
+      window.location.href = 'index.html';
+      return;
+    }
+    if (active.id === 'screen-timer' || active.id === 'screen-rsvp') {
+      if (!confirm('Выйти? Прогресс не сохранится.')) return;
+    }
+    show('screen-menu');
+  };
+
+  // ─── Init ───────────────────────────────
+  renderLevels();
+  renderTexts();
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.mode === state.mode);
+  });
+  $('wpmSection').style.display = state.mode === 'rsvp' ? 'block' : 'none';
+  $('wpmStart').textContent = state.wpm;
+})();
+</script>
+</body>
+</html>
