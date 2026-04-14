@@ -297,6 +297,27 @@ body {
 .big-btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
 .big-btn:disabled:active { transform: none; }
 
+/* Confirm button as a bottom overlay in the picker screen */
+#confirmPickBtn {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  width: calc(100% - 24px);
+  max-width: 576px;
+  margin: 0;
+  padding: 18px;
+  border-radius: 16px;
+  z-index: 80;
+  transform: translateX(-50%) translateY(150%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 6px 24px rgba(156, 39, 176, 0.35), 0 -2px 12px rgba(0,0,0,0.08);
+  opacity: 1;
+}
+#confirmPickBtn:not(:disabled) {
+  transform: translateX(-50%) translateY(0);
+}
+#screen-picker { padding-bottom: 100px; }
+
 .tip {
   background: var(--purple-light);
   color: var(--purple-dark);
@@ -640,7 +661,13 @@ body {
       'screen-results': 'Результат'
     };
     $('headerTitle').textContent = titles[id] || 'Тренажёр чтения';
+    window.scrollTo(0, 0);
   }
+
+  // Don't let the browser restore scroll position on reload/back —
+  // always start at the top.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
 
   // ─── Helpers ────────────────────────────
   const LETTER_RE = /[а-яёА-ЯЁa-zA-Z]/;
