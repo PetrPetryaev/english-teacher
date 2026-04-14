@@ -5,1490 +5,180 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Spotlight 2 - Learn English</title>
+<title>Учимся — выбери предмет</title>
 <style>
 :root {
   --pink: #e91e8c;
   --pink-light: #fce4f3;
   --green: #4CAF50;
-  --green-light: #e8f5e9;
   --orange: #FF9800;
-  --orange-light: #fff3e0;
   --blue: #2196F3;
   --blue-light: #e3f2fd;
   --purple: #9C27B0;
-  --purple-light: #f3e5f5;
-  --red: #f44336;
-  --red-light: #ffebee;
-  --grey: #607D8B;
   --bg: #fafafa;
-  --card-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  --radius: 16px;
+  --card-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  --radius: 20px;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
+  background: linear-gradient(135deg, #fafafa 0%, #f0f4fa 100%);
   color: #333;
   min-height: 100vh;
-  overflow-x: hidden;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* ─── Header ─── */
-.header {
-  background: linear-gradient(135deg, var(--pink), #c2185b);
-  color: white;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-}
-.header .back-btn {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  display: none;
-  align-items: center;
-  justify-content: center;
-}
-.header .back-btn.visible { display: flex; }
-.header h1 { font-size: 18px; font-weight: 600; flex: 1; }
-.header .stats-btn {
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-/* ─── Main Menu ─── */
-.main-menu {
-  padding: 20px 16px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-.menu-section {
-  margin-bottom: 24px;
-}
-.menu-section h2 {
-  font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #999;
-  margin-bottom: 12px;
-  padding-left: 4px;
-}
-.menu-card {
-  background: white;
-  border-radius: var(--radius);
-  padding: 18px 20px;
-  margin-bottom: 12px;
-  box-shadow: var(--card-shadow);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: transform 0.15s, box-shadow 0.15s;
-  border-left: 5px solid;
-}
-.menu-card:active { transform: scale(0.97); }
-.menu-card .icon {
-  width: 48px; height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-.menu-card .info { flex: 1; }
-.menu-card .info h3 { font-size: 16px; margin-bottom: 4px; }
-.menu-card .info p { font-size: 13px; color: #888; }
-.menu-card .progress-badge {
-  background: var(--green-light);
-  color: var(--green);
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* ─── Section View (list of units/topics) ─── */
-.section-view {
-  padding: 20px 16px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-.unit-card {
-  background: white;
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  transition: transform 0.15s;
-}
-.unit-card:active { transform: scale(0.97); }
-.unit-card .unit-num {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  color: white;
-  flex-shrink: 0;
-}
-.unit-card .unit-info { flex: 1; }
-.unit-card .unit-info h3 { font-size: 15px; }
-.unit-card .unit-info p { font-size: 12px; color: #999; margin-top: 2px; }
-.unit-card .unit-count {
-  font-size: 12px;
-  color: #aaa;
-  white-space: nowrap;
-}
-
-/* ─── Flashcard View ─── */
-.flashcard-view {
-  padding: 20px 16px;
-  max-width: 500px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  min-height: calc(100vh - 68px);
-}
-.card-progress {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.card-progress .bar {
-  flex: 1;
-  height: 6px;
-  background: #e0e0e0;
-  border-radius: 3px;
-  overflow: hidden;
-}
-.card-progress .bar-fill {
-  height: 100%;
-  background: var(--green);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-.card-progress .count {
-  font-size: 13px;
-  color: #888;
-  white-space: nowrap;
-}
-
-.flashcard-container {
-  flex: 1;
+  -webkit-user-select: none;
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 24px;
+  padding: 28px 20px;
 }
 
-.flashcard {
+.container {
   width: 100%;
-  min-height: 280px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+  max-width: 500px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex: 1;
   justify-content: center;
-  padding: 32px 24px;
-  position: relative;
-  transition: transform 0.3s;
-}
-.flashcard.flip { animation: flipIn 0.4s ease; }
-@keyframes flipIn {
-  0% { transform: rotateY(90deg); opacity: 0; }
-  100% { transform: rotateY(0); opacity: 1; }
 }
 
-.flashcard .card-label {
-  position: absolute;
-  top: 16px;
-  left: 20px;
-  font-size: 11px;
-  color: #bbb;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
 }
-.flashcard .word-en {
-  font-size: 36px;
+.hero .emoji {
+  font-size: 64px;
+  margin-bottom: 12px;
+  display: block;
+  animation: bounce 2s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero h1 {
+  font-size: 28px;
   font-weight: 700;
   color: #333;
-  text-align: center;
   margin-bottom: 8px;
 }
-.flashcard .word-transcription {
-  font-size: 18px;
-  color: #999;
-  margin-bottom: 16px;
-}
-.flashcard .word-ru {
-  font-size: 28px;
-  color: var(--pink);
-  font-weight: 500;
-  text-align: center;
-}
-.flashcard .letter-big {
-  font-size: 100px;
-  font-weight: 700;
-  color: var(--blue);
-  line-height: 1;
-}
-.flashcard .letter-small {
-  font-size: 60px;
-  color: #666;
-  margin-top: 8px;
-}
-.flashcard .letter-word {
-  font-size: 28px;
-  color: #555;
-  margin-top: 16px;
-}
-.flashcard .letter-word span {
-  color: var(--pink);
-  font-weight: 700;
-}
-.flashcard .blend-combo {
-  font-size: 72px;
-  font-weight: 700;
-  color: var(--purple);
-}
-.flashcard .blend-sound {
-  font-size: 24px;
+.hero p {
+  font-size: 15px;
   color: #888;
-  margin-top: 8px;
-}
-.flashcard .example-word {
-  font-size: 32px;
-  margin-top: 16px;
-  color: #444;
 }
 
-.check-btn {
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   width: 100%;
-  padding: 18px;
-  background: var(--blue);
+}
+
+.card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 22px;
+  border-radius: var(--radius);
+  text-decoration: none;
   color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+  overflow: hidden;
 }
-.check-btn:active { transform: scale(0.97); }
-
-.answer-btns {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
-.answer-btns button {
-  flex: 1;
-  padding: 18px;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.1s;
-}
-.answer-btns button:active { transform: scale(0.97); }
-.btn-dont-know {
-  background: var(--red-light);
-  color: var(--red);
-}
-.btn-know {
-  background: var(--green-light);
-  color: var(--green);
-}
-
-/* ─── Stats Modal ─── */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  z-index: 200;
-  display: none;
-  align-items: flex-end;
-  justify-content: center;
-}
-.modal-overlay.active { display: flex; }
-.modal {
-  background: white;
-  border-radius: 20px 20px 0 0;
-  width: 100%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 24px 20px;
-  animation: slideUp 0.3s ease;
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-.modal h2 { font-size: 20px; margin-bottom: 20px; text-align: center; }
-.modal .stat-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-.modal .stat-row:last-child { border: none; }
-.modal .stat-label { color: #666; }
-.modal .stat-value { font-weight: 600; }
-.modal .close-btn {
-  width: 100%;
-  padding: 14px;
-  background: #f5f5f5;
-  border: none;
-  border-radius: 12px;
-  font-size: 16px;
-  cursor: pointer;
-  margin-top: 16px;
-}
-.modal .reset-btn {
-  width: 100%;
-  padding: 14px;
-  background: var(--red-light);
-  color: var(--red);
-  border: none;
-  border-radius: 12px;
-  font-size: 14px;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-/* ─── Completion Screen ─── */
-.completion {
-  text-align: center;
-  padding: 40px 20px;
-}
-.completion .emoji { font-size: 64px; margin-bottom: 16px; }
-.completion h2 { font-size: 24px; margin-bottom: 8px; }
-.completion p { color: #888; font-size: 16px; margin-bottom: 12px; }
-.completion .stats-line {
-  display: flex;
-  justify-content: center;
-  gap: 24px;
-  margin: 20px 0;
-}
-.completion .stats-line div { text-align: center; }
-.completion .stats-line .num { font-size: 32px; font-weight: 700; }
-.completion .stats-line .label { font-size: 12px; color: #999; }
-.completion .restart-btn {
-  padding: 16px 40px;
-  background: var(--pink);
-  color: white;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-/* ─── Reading section ─── */
-.reading-card {
-  width: 100%;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-  padding: 28px 24px;
-  text-align: center;
-}
-.reading-card .phoneme {
-  font-size: 20px;
-  color: var(--purple);
-  margin-bottom: 12px;
-  font-weight: 600;
-}
-.reading-card .word-list-reading {
-  font-size: 26px;
-  line-height: 1.8;
-  color: #333;
-}
-.reading-card .phrase-pyramid {
-  font-size: 22px;
-  line-height: 2;
-  color: #333;
-}
-.reading-card .phrase-pyramid .highlight {
-  color: var(--pink);
-  font-weight: 600;
-}
-.reading-card .mini-text {
-  background: var(--pink-light);
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 16px;
-  font-size: 18px;
-  line-height: 1.6;
-  text-align: left;
-  color: #444;
-}
-
-/* Hide all screens */
-.screen { display: none; }
-.screen.active { display: block; }
-
-/* Leitner box indicators */
-.box-indicator {
+.card::after {
+  content: '';
   position: absolute;
-  top: 16px;
-  right: 20px;
-  display: flex;
-  gap: 3px;
-}
-.box-indicator .box-dot {
-  width: 8px; height: 8px;
+  top: -40%;
+  right: -20%;
+  width: 180px;
+  height: 180px;
+  background: rgba(255,255,255,0.1);
   border-radius: 50%;
-  background: #e0e0e0;
+  pointer-events: none;
 }
-.box-indicator .box-dot.filled { background: var(--green); }
-.box-indicator .box-dot.current { background: var(--orange); }
+.card:active { transform: scale(0.98); }
 
-/* Shuffle toggle */
-.shuffle-toggle {
+.card.english {
+  background: linear-gradient(135deg, var(--pink), #c2185b);
+  box-shadow: 0 10px 28px rgba(233, 30, 140, 0.3);
+}
+.card.math {
+  background: linear-gradient(135deg, var(--blue), #1565C0);
+  box-shadow: 0 10px 28px rgba(33, 150, 243, 0.3);
+}
+
+.card .icon {
+  font-size: 42px;
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  background: rgba(255,255,255,0.22);
+  border-radius: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding: 10px 16px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  backdrop-filter: blur(8px);
 }
-.shuffle-toggle label {
-  font-size: 14px;
-  color: #666;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+
+.card .content { flex: 1; }
+.card .title {
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
 }
-.shuffle-toggle input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  accent-color: var(--pink);
+.card .subtitle {
+  font-size: 13px;
+  opacity: 0.85;
 }
-.mode-btns {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+.card .arrow {
+  font-size: 26px;
+  opacity: 0.7;
+  font-weight: 300;
 }
-.mode-btn {
-  flex: 1;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  background: white;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
+
+.footer {
+  margin-top: 28px;
+  font-size: 12px;
+  color: #999;
   text-align: center;
-  transition: all 0.2s;
-  color: #666;
-}
-.mode-btn:active { transform: scale(0.97); }
-.mode-btn.active {
-  border-color: var(--pink);
-  color: var(--pink);
-  background: var(--pink-light);
 }
 </style>
 </head>
 <body>
-
-<div class="header">
-  <button class="back-btn" id="backBtn" onclick="goBack()">&#8249;</button>
-  <h1 id="headerTitle">Spotlight 2</h1>
-  <button class="stats-btn" id="statsBtn" onclick="showStats()">&#9776;</button>
-</div>
-
-<div id="mainMenu" class="screen active">
-  <div class="main-menu">
-    <div class="menu-section">
-      <h2>&#127912; Буквы и звуки</h2>
-      <div class="menu-card" style="border-color: var(--blue)" onclick="openSection('alphabet')">
-        <div class="icon" style="background: var(--blue-light); color: var(--blue)">Aa</div>
-        <div class="info">
-          <h3>Алфавит</h3>
-          <p>26 букв: заглавные и строчные</p>
-        </div>
-        <div class="progress-badge" id="prog-alphabet">0%</div>
-      </div>
-      <div class="menu-card" style="border-color: var(--purple)" onclick="openSection('phonics')">
-        <div class="icon" style="background: var(--purple-light); color: var(--purple)">&#128264;</div>
-        <div class="info">
-          <h3>Звуки букв</h3>
-          <p>Звук + слово на каждую букву</p>
-        </div>
-        <div class="progress-badge" id="prog-phonics">0%</div>
-      </div>
-      <div class="menu-card" style="border-color: var(--orange)" onclick="openSection('blends')">
-        <div class="icon" style="background: var(--orange-light); color: var(--orange)">sh</div>
-        <div class="info">
-          <h3>Буквосочетания</h3>
-          <p>sh, ch, th, ph, ck, ng</p>
-        </div>
-        <div class="progress-badge" id="prog-blends">0%</div>
-      </div>
-      <div class="menu-card" style="border-color: var(--green)" onclick="openSection('reading')">
-        <div class="icon" style="background: var(--green-light); color: var(--green)">&#128214;</div>
-        <div class="info">
-          <h3>Первые шаги к чтению</h3>
-          <p>Слова, фразы, предложения</p>
-        </div>
-        <div class="progress-badge" id="prog-reading">--</div>
-      </div>
+  <div class="container">
+    <div class="hero">
+      <span class="emoji">🎒</span>
+      <h1>Что учим сегодня?</h1>
+      <p>Выбери, чем хочешь заняться</p>
     </div>
 
-    <div class="menu-section">
-      <h2>&#128218; Словарь по темам</h2>
-      <div id="moduleCards"></div>
+    <div class="cards">
+      <a href="english.html" class="card english">
+        <div class="icon">🇬🇧</div>
+        <div class="content">
+          <div class="title">Английский</div>
+          <div class="subtitle">Spotlight 2 — слова и звуки</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
+      <a href="multiplication.html" class="card math">
+        <div class="icon">✖️</div>
+        <div class="content">
+          <div class="title">Таблица умножения</div>
+          <div class="subtitle">Тренажёр с подсказками</div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
     </div>
   </div>
-</div>
 
-<div id="sectionView" class="screen">
-  <div class="section-view" id="sectionContent"></div>
-</div>
-
-<div id="flashcardView" class="screen">
-  <div class="flashcard-view" id="flashcardContent"></div>
-</div>
-
-<div class="modal-overlay" id="statsModal">
-  <div class="modal" id="statsContent"></div>
-</div>
-
-<script>
-// ═══════════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════════
-
-const ALPHABET = [
-  {upper:'A', lower:'a', word:'ant', wordRu:'муравей', sound:'/ae/'},
-  {upper:'B', lower:'b', word:'bed', wordRu:'кровать', sound:'/b/'},
-  {upper:'C', lower:'c', word:'cat', wordRu:'кот', sound:'/k/'},
-  {upper:'D', lower:'d', word:'dog', wordRu:'собака', sound:'/d/'},
-  {upper:'E', lower:'e', word:'egg', wordRu:'яйцо', sound:'/e/'},
-  {upper:'F', lower:'f', word:'flag', wordRu:'флаг', sound:'/f/'},
-  {upper:'G', lower:'g', word:'glass', wordRu:'стакан', sound:'/g/'},
-  {upper:'H', lower:'h', word:'horse', wordRu:'лошадь', sound:'/h/'},
-  {upper:'I', lower:'i', word:'ink', wordRu:'чернила', sound:'/i/'},
-  {upper:'J', lower:'j', word:'jug', wordRu:'кувшин', sound:'/dz/'},
-  {upper:'K', lower:'k', word:'kangaroo', wordRu:'кенгуру', sound:'/k/'},
-  {upper:'L', lower:'l', word:'lamp', wordRu:'лампа', sound:'/l/'},
-  {upper:'M', lower:'m', word:'mouse', wordRu:'мышь', sound:'/m/'},
-  {upper:'N', lower:'n', word:'nest', wordRu:'гнездо', sound:'/n/'},
-  {upper:'O', lower:'o', word:'orange', wordRu:'апельсин', sound:'/o/'},
-  {upper:'P', lower:'p', word:'pin', wordRu:'булавка', sound:'/p/'},
-  {upper:'Q', lower:'q', word:'queen', wordRu:'королева', sound:'/kw/'},
-  {upper:'R', lower:'r', word:'rabbit', wordRu:'кролик', sound:'/r/'},
-  {upper:'S', lower:'s', word:'snake', wordRu:'змея', sound:'/s/'},
-  {upper:'T', lower:'t', word:'tree', wordRu:'дерево', sound:'/t/'},
-  {upper:'U', lower:'u', word:'umbrella', wordRu:'зонт', sound:'/u/'},
-  {upper:'V', lower:'v', word:'vest', wordRu:'жилет', sound:'/v/'},
-  {upper:'W', lower:'w', word:'window', wordRu:'окно', sound:'/w/'},
-  {upper:'X', lower:'x', word:'box', wordRu:'коробка', sound:'/ks/'},
-  {upper:'Y', lower:'y', word:'yacht', wordRu:'яхта', sound:'/j/'},
-  {upper:'Z', lower:'z', word:'zip', wordRu:'молния', sound:'/z/'}
-];
-
-const PHONICS_ORDER = [
-  // High-utility first (s,a,t,i,p,n) then expanding
-  {letter:'s', word:'snake', wordRu:'змея', sound:'/s/'},
-  {letter:'a', word:'ant', wordRu:'муравей', sound:'/ae/'},
-  {letter:'t', word:'tree', wordRu:'дерево', sound:'/t/'},
-  {letter:'i', word:'ink', wordRu:'чернила', sound:'/i/'},
-  {letter:'p', word:'pin', wordRu:'булавка', sound:'/p/'},
-  {letter:'n', word:'nest', wordRu:'гнездо', sound:'/n/'},
-  {letter:'c', word:'cat', wordRu:'кот', sound:'/k/'},
-  {letter:'d', word:'dog', wordRu:'собака', sound:'/d/'},
-  {letter:'m', word:'mouse', wordRu:'мышь', sound:'/m/'},
-  {letter:'o', word:'orange', wordRu:'апельсин', sound:'/o/'},
-  {letter:'g', word:'glass', wordRu:'стакан', sound:'/g/'},
-  {letter:'h', word:'horse', wordRu:'лошадь', sound:'/h/'},
-  {letter:'e', word:'egg', wordRu:'яйцо', sound:'/e/'},
-  {letter:'b', word:'bed', wordRu:'кровать', sound:'/b/'},
-  {letter:'f', word:'flag', wordRu:'флаг', sound:'/f/'},
-  {letter:'l', word:'lamp', wordRu:'лампа', sound:'/l/'},
-  {letter:'u', word:'umbrella', wordRu:'зонт', sound:'/u/'},
-  {letter:'r', word:'rabbit', wordRu:'кролик', sound:'/r/'},
-  {letter:'k', word:'kangaroo', wordRu:'кенгуру', sound:'/k/'},
-  {letter:'w', word:'window', wordRu:'окно', sound:'/w/'},
-  {letter:'j', word:'jug', wordRu:'кувшин', sound:'/dz/'},
-  {letter:'v', word:'vest', wordRu:'жилет', sound:'/v/'},
-  {letter:'x', word:'box', wordRu:'коробка', sound:'/ks/'},
-  {letter:'y', word:'yacht', wordRu:'яхта', sound:'/j/'},
-  {letter:'z', word:'zip', wordRu:'молния', sound:'/z/'},
-  {letter:'q', word:'queen', wordRu:'королева', sound:'/kw/'}
-];
-
-const BLENDS = [
-  {blend:'sh', sound:'/sh/', words:['sheep','fish','ship','shelf','she'], wordsRu:['овца','рыба','корабль','полка','она']},
-  {blend:'ch', sound:'/ch/', words:['chick','cheese','children','chocolate','chair'], wordsRu:['цыплёнок','сыр','дети','шоколад','стул']},
-  {blend:'th', sound:'/th/', words:['three','thumb','the','this','they'], wordsRu:['три','большой палец','(артикль)','это','они']},
-  {blend:'ph', sound:'/f/', words:['photo','dolphin','elephant','phone'], wordsRu:['фото','дельфин','слон','телефон']},
-  {blend:'ck', sound:'/k/', words:['black','duck','clock','stick'], wordsRu:['чёрный','утка','часы','палка']},
-  {blend:'ng', sound:'/ng/', words:['sing','ring','long','king'], wordsRu:['петь','кольцо','длинный','король']}
-];
-
-const READING_EXERCISES = [
-  {phoneme:'/ae/ vs /ei/', words:'cat, fat, hat, bat, cap, black, can, hand, man', words2:'cake, snake, lake, plane, Jane, name, plate, Dave', pyramid:['a cat','a fat cat','a fat black cat','Mack is a fat black cat.']},
-  {phoneme:'/i/ vs /ai/', words:'milk, pink, Kim, sit, big, swim, rich, is, sister, kitten, little', words2:'bike, like, Mike, kite, write, white, fine, nine, ride, drive, five, ice, I, hi', pyramid:['a kitten','a white kitten','a little white kitten','I have a little white kitten.']},
-  {phoneme:'/i:/ vs /e/', words:'we, me, be, he, she, Pete', words2:'zebra, seven, desk, men, ten, pen, hen, red, bed, wet, egg, leg, dress, elf, Ken'},
-  {phoneme:'/ai/ vs /i/', words:'fly, sky, bye, my', words2:'baby, teddy, pretty, family', pyramid:['my kite','my pink kite','fly my pink kite','I like to fly my pink kite.']},
-  {phoneme:'/ou/ vs /o/', words:'home, bone, rose, go, ghost, rope, nose, no, Tony', words2:'frog, dog, stop, hot, got, on, Donna', pyramid:['a puppy','a funny puppy','run, funny puppy','Run home, funny puppy.']},
-  {phoneme:'/ju:/ vs /^/', words:'pupil, cute, computer, use, student, music', words2:'nut, but, drum, sun, fun, run, bus, cup, jump, puppy, rubber, Russia'},
-  {phoneme:'/i:/', words:'bee, tree, feet, deep, feel, sweets, green, queen, eat, meat, team, read, jeans, peas, please'},
-  {phoneme:'/u:/ vs /u/', words:'blue, glue, true, room, food, zoo, moon, cool', words2:'book, look, good, cook, foot, wood'},
-  {phoneme:'/a:/ vs /^/', words:'car, star, park, dark, arm, farm, garden, father', words2:'cup, bus, mum, funny, duck, run, jump'},
-  {phoneme:'/o:/', words:'ball, call, fall, all, tall, wall, small, horse, door, floor, four, more'},
-  {phoneme:'/ei/ vs /oi/', words:'play, grey, day, way, say, pay, away, today, Friday', words2:'boy, toy'}
-];
-
-const VOCABULARY = {
-  'lets_go': {
-    name: "Let's Go!",
-    color: 'var(--pink)',
-    words: [
-      ['hello','здравствуй(те)'],['goodbye','до свидания'],['and','и'],
-      ['go','идти, ходить'],['fine, thanks','Спасибо, хорошо!'],
-      ['How are you?','Как дела?'],['I','я'],["let's",'давай(те)'],
-      ['me','мне'],['my','мой'],["What's your name?",'Как тебя зовут?'],
-      ['you','ты, вы']
-    ]
-  },
-  'starter': {
-    name: "Hello! My Family!",
-    color: 'var(--pink)',
-    words: [
-      ['book','книга'],['brother','брат'],['children','дети'],
-      ['daddy','папа'],['friend','друг'],['grandma','бабушка'],
-      ['grandpa','дедушка'],['mummy','мама'],['pen','ручка'],
-      ['pencil','карандаш'],['sister','сестра'],['sit down','садись, садитесь'],
-      ['stand up','встань(те)'],['workbook','тетрадь']
-    ]
-  },
-  'family': {
-    name: "My Family!",
-    color: 'var(--pink)',
-    words: [
-      ['blue','голубой, синий'],['colour','цвет'],['family','семья'],
-      ['green','зелёный'],['meet','встречаться, знакомиться'],
-      ['red','красный'],['white','белый'],['yellow','жёлтый']
-    ]
-  },
-  'm1_u1': {
-    name: "My Home!",
-    color: 'var(--orange)',
-    words: [
-      ['bed','кровать'],['chair','стул'],['home','дом'],
-      ['house','дом (строение)'],['in','в'],['it','он, она, оно'],
-      ['look at','смотреть на'],['lovely','прекрасный, красивый'],
-      ['nice','хороший, милый'],['our','наш'],['radio','радио'],
-      ['see','видеть'],['table','стол'],['tree house','домик на дереве'],
-      ["What's this?",'Что это?'],['yes','да']
-    ]
-  },
-  'm1_u2': {
-    name: "Where's Chuckles?",
-    color: 'var(--orange)',
-    words: [
-      ['bathroom','ванная комната'],['bedroom','спальня'],
-      ['black','чёрный'],['brown','коричневый'],['garden','сад'],
-      ['he','он'],['kitchen','кухня'],['no','нет'],['she','она'],
-      ['they','они'],['where','где']
-    ]
-  },
-  'm1_u3': {
-    name: "In the Bath!",
-    color: 'var(--orange)',
-    words: [
-      ['bath','ванна'],['door','дверь'],['eye','глаз'],
-      ['living room','гостиная'],['make','делать'],['on','на'],
-      ['window','окно']
-    ]
-  },
-  'm2_u4': {
-    name: "My Birthday!",
-    color: 'var(--green)',
-    words: [
-      ['age','возраст'],['birthday','день рождения'],['candle','свеча'],
-      ['city','город'],['country','страна'],['eight','восемь'],
-      ['five','пять'],['four','четыре'],['happy','счастливый'],
-      ['How old are you?','Сколько тебе лет?'],['nine','девять'],
-      ['one','один'],['party','празднование, праздник'],['sad','грустный'],
-      ['seven','семь'],['six','шесть'],['ten','десять'],
-      ['they','они'],['three','три']
-    ]
-  },
-  'm2_u5': {
-    name: "Yummy Chocolate!",
-    color: 'var(--green)',
-    words: [
-      ['apple','яблоко'],['banana','банан'],['biscuit','печенье'],
-      ['burger','бургер'],['chips','жареная картошка'],
-      ['chocolate','шоколад'],['give','давать'],['please','пожалуйста'],
-      ['sandwich','бутерброд'],['Thank you!','Спасибо!'],['too','тоже'],
-      ["What's your favourite food?",'Какая у тебя любимая еда?'],
-      ['yummy','вкусный']
-    ]
-  },
-  'm2_u6': {
-    name: "My Favourite Food!",
-    color: 'var(--green)',
-    words: [
-      ['eat','есть'],['ice cream','мороженое'],['milk','молоко'],
-      ['orange juice','апельсиновый сок'],['pizza','пицца']
-    ]
-  },
-  'm3_u7': {
-    name: "My Animals!",
-    color: 'var(--blue)',
-    words: [
-      ['animal','животное'],['bird','птица'],['chimp','шимпанзе'],
-      ['dance','танцевать'],['fish','рыба'],['frog','лягушка'],
-      ['horse','лошадь'],['jump','прыгать'],['run','бегать'],
-      ['sing','петь'],['swim','плавать']
-    ]
-  },
-  'm3_u8': {
-    name: "I Can Jump!",
-    color: 'var(--blue)',
-    words: [
-      ['boy','мальчик'],['can','мочь, уметь'],['climb','взбираться'],
-      ['fly','летать'],['girl','девочка']
-    ]
-  },
-  'm3_u9': {
-    name: "At the Circus!",
-    color: 'var(--blue)',
-    words: [
-      ['circus','цирк'],['clown','клоун'],['funny','смешной'],
-      ['magician','фокусник'],['swing','качаться']
-    ]
-  },
-  'm4_u10': {
-    name: "My Toys!",
-    color: 'var(--purple)',
-    words: [
-      ['ballerina','балерина'],['doll','кукла'],['have fun','веселиться'],
-      ['his','его'],['shelf','полка'],['teddy bear','плюшевый медведь'],
-      ['toy','игрушка'],['toy box','коробка для игрушек'],
-      ['toy soldier','игрушечный солдатик'],['under','под']
-    ]
-  },
-  'm4_u11': {
-    name: "She's got blue eyes!",
-    color: 'var(--purple)',
-    words: [
-      ['clever','умный'],['dark hair','тёмные волосы'],['ear','ухо'],
-      ['feet','ноги'],['hand','рука'],['mouth','рот'],['nose','нос'],
-      ['wonderful','чудесный, прекрасный']
-    ]
-  },
-  'm4_u12': {
-    name: "Teddy's Wonderful!",
-    color: 'var(--purple)',
-    words: [
-      ['ball','мяч'],['fair hair','светлые волосы'],
-      ['jack-in-the-box','попрыгунчик (игрушка)'],
-      ['puppet','кукла (надевающаяся на руку)']
-    ]
-  },
-  'm5_u13': {
-    name: "My Holidays!",
-    color: 'var(--red)',
-    words: [
-      ['boat','лодка'],['coat','пальто'],['hat','шляпа'],
-      ['holiday','праздник, отпуск'],["It's hot!",'Жарко!'],
-      ["It's raining!",'Идёт дождь!'],["It's sunny!",'Солнечно!'],
-      ['jacket','куртка'],['play','играть'],['put on','надевать'],
-      ['shorts','шорты'],['take off','снимать'],['wear','носить'],
-      ["What's the weather like?",'Какая сейчас погода?']
-    ]
-  },
-  'm5_u14': {
-    name: "It's Windy!",
-    color: 'var(--red)',
-    words: [
-      ['island','остров'],["It's cold!",'Холодно!'],["It's windy!",'Ветрено!'],
-      ['jeans','джинсы'],['magic','волшебный'],['shoes','туфли'],
-      ['skirt','юбка'],['socks','носки'],['T-shirt','футболка, тенниска']
-    ]
-  },
-  'm5_u15': {
-    name: "A Magic Island!",
-    color: 'var(--red)',
-    words: [
-      ['autumn','осень'],['English','английский (язык)'],['flower','цветок'],
-      ['music','музыка'],['sea','море'],['spring','весна'],
-      ['summer','лето'],['sun','солнце'],['winter','зима']
-    ]
-  }
-};
-
-// ═══════════════════════════════════════════════
-// STATE & LEITNER SYSTEM
-// ═══════════════════════════════════════════════
-
-let state = {
-  screen: 'menu',
-  history: [],
-  currentSection: null,
-  currentUnit: null,
-  currentCards: [],
-  currentIndex: 0,
-  showAnswer: false,
-  sessionKnow: 0,
-  sessionDontKnow: 0,
-  shuffleMode: false
-};
-
-function setAlphaMode(shuffled) {
-  state.shuffleMode = shuffled;
-  document.getElementById('alphaOrderBtn').classList.toggle('active', !shuffled);
-  document.getElementById('alphaShuffleBtn').classList.toggle('active', shuffled);
-}
-
-function setPhonicsMode(shuffled) {
-  state.shuffleMode = shuffled;
-  document.getElementById('phonicsOrderBtn').classList.toggle('active', !shuffled);
-  document.getElementById('phonicsShuffleBtn').classList.toggle('active', shuffled);
-}
-
-function loadProgress() {
-  try {
-    return JSON.parse(localStorage.getItem('spotlight2_progress') || '{}');
-  } catch { return {}; }
-}
-
-function saveProgress(p) {
-  localStorage.setItem('spotlight2_progress', JSON.stringify(p));
-}
-
-function getCardBox(key) {
-  const p = loadProgress();
-  return (p[key] || {}).box || 1;
-}
-
-function updateCardBox(key, know) {
-  const p = loadProgress();
-  if (!p[key]) p[key] = { box: 1, lastSeen: 0 };
-  if (know) {
-    p[key].box = Math.min(3, p[key].box + 1);
-  } else {
-    p[key].box = 1;
-  }
-  p[key].lastSeen = Date.now();
-  saveProgress(p);
-}
-
-function getSectionProgress(prefix) {
-  const p = loadProgress();
-  let total = 0, mastered = 0;
-  for (const k in p) {
-    if (k.startsWith(prefix + ':')) {
-      total++;
-      if (p[k].box >= 3) mastered++;
-    }
-  }
-  return { total, mastered };
-}
-
-// ═══════════════════════════════════════════════
-// RENDERING
-// ═══════════════════════════════════════════════
-
-function render() {
-  document.getElementById('mainMenu').classList.toggle('active', state.screen === 'menu');
-  document.getElementById('sectionView').classList.toggle('active', state.screen === 'section');
-  document.getElementById('flashcardView').classList.toggle('active', state.screen === 'cards');
-
-  const backBtn = document.getElementById('backBtn');
-  backBtn.classList.toggle('visible', state.screen !== 'menu');
-
-  updateProgressBadges();
-}
-
-function updateProgressBadges() {
-  // Alphabet
-  updateBadge('prog-alphabet', 'alphabet', 26);
-  // Phonics
-  updateBadge('prog-phonics', 'phonics', 26);
-  // Blends
-  let blendTotal = 0;
-  BLENDS.forEach(b => blendTotal += b.words.length);
-  updateBadge('prog-blends', 'blend', blendTotal);
-
-  // Module cards progress
-  for (const key in VOCABULARY) {
-    const el = document.getElementById('prog-' + key);
-    if (el) {
-      const prog = getSectionProgress('vocab_' + key);
-      const total = VOCABULARY[key].words.length;
-      const pct = total > 0 ? Math.round((prog.mastered / total) * 100) : 0;
-      el.textContent = pct + '%';
-    }
-  }
-}
-
-function updateBadge(id, prefix, total) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const prog = getSectionProgress(prefix);
-  const pct = total > 0 ? Math.round((prog.mastered / total) * 100) : 0;
-  el.textContent = pct + '%';
-}
-
-// Build module cards
-function buildModuleCards() {
-  const container = document.getElementById('moduleCards');
-  const modules = [
-    { label: 'Starter Module', keys: ['lets_go','starter','family'], color: 'var(--pink)', icon: '&#128075;' },
-    { label: 'Module 1: My Home!', keys: ['m1_u1','m1_u2','m1_u3'], color: 'var(--orange)', icon: '&#127968;' },
-    { label: 'Module 2: My Birthday!', keys: ['m2_u4','m2_u5','m2_u6'], color: 'var(--green)', icon: '&#127874;' },
-    { label: 'Module 3: My Animals!', keys: ['m3_u7','m3_u8','m3_u9'], color: 'var(--blue)', icon: '&#128062;' },
-    { label: 'Module 4: My Toys!', keys: ['m4_u10','m4_u11','m4_u12'], color: 'var(--purple)', icon: '&#129528;' },
-    { label: 'Module 5: My Holidays!', keys: ['m5_u13','m5_u14','m5_u15'], color: 'var(--red)', icon: '&#9728;' }
-  ];
-
-  let html = '';
-  modules.forEach(mod => {
-    let totalWords = 0;
-    mod.keys.forEach(k => { if (VOCABULARY[k]) totalWords += VOCABULARY[k].words.length; });
-
-    html += `<div class="menu-card" style="border-color:${mod.color}" onclick="openModuleSection('${mod.keys.join(',')}','${mod.label}')">
-      <div class="icon" style="background:${mod.color}20;color:${mod.color}">${mod.icon}</div>
-      <div class="info">
-        <h3>${mod.label}</h3>
-        <p>${totalWords} слов</p>
-      </div>
-      <div class="progress-badge" id="prog-mod-${mod.keys[0]}">0%</div>
-    </div>`;
-  });
-  container.innerHTML = html;
-}
-
-// ═══════════════════════════════════════════════
-// SECTION OPENERS
-// ═══════════════════════════════════════════════
-
-function openSection(section) {
-  state.currentSection = section;
-  state.history.push('menu');
-  state.screen = 'section';
-
-  const container = document.getElementById('sectionContent');
-  let html = '';
-
-  if (section === 'alphabet') {
-    document.getElementById('headerTitle').textContent = 'Алфавит';
-    // Group by 6-7 letters
-    html += `<div class="mode-btns">
-      <div class="mode-btn active" id="alphaOrderBtn" onclick="setAlphaMode(false)">По порядку</div>
-      <div class="mode-btn" id="alphaShuffleBtn" onclick="setAlphaMode(true)">Вразнобой</div>
-    </div>`;
-    const groups = [
-      {name:'A - F', letters: ALPHABET.slice(0,6)},
-      {name:'G - L', letters: ALPHABET.slice(6,12)},
-      {name:'M - R', letters: ALPHABET.slice(12,18)},
-      {name:'S - Z', letters: ALPHABET.slice(18,26)},
-      {name:'Все буквы', letters: ALPHABET}
-    ];
-    groups.forEach((g, i) => {
-      html += `<div class="unit-card" onclick="startAlphabetCards(${i}, state.shuffleMode)">
-        <div class="unit-num" style="background:var(--blue)">${i < 4 ? g.name.split(' ')[0] : '26'}</div>
-        <div class="unit-info">
-          <h3>${g.name}</h3>
-          <p>${g.letters.length} букв</p>
-        </div>
-        <div class="unit-count">${g.letters.length}</div>
-      </div>`;
-    });
-  }
-
-  else if (section === 'phonics') {
-    document.getElementById('headerTitle').textContent = 'Звуки букв';
-    html += `<div class="mode-btns">
-      <div class="mode-btn active" id="phonicsOrderBtn" onclick="setPhonicsMode(false)">По порядку</div>
-      <div class="mode-btn" id="phonicsShuffleBtn" onclick="setPhonicsMode(true)">Вразнобой</div>
-    </div>`;
-    const groups = [
-      {name:'Группа 1: s, a, t, i, p, n', desc:'Самые полезные - из них можно сразу составлять слова', letters: PHONICS_ORDER.slice(0,6)},
-      {name:'Группа 2: c, d, m, o, g, h', desc:'Расширяем словарный запас', letters: PHONICS_ORDER.slice(6,12)},
-      {name:'Группа 3: e, b, f, l, u, r', desc:'Больше согласных и гласных', letters: PHONICS_ORDER.slice(12,18)},
-      {name:'Группа 4: k, w, j, v, x, y, z, q', desc:'Оставшиеся буквы', letters: PHONICS_ORDER.slice(18,26)},
-      {name:'Все звуки', desc:'Все 26 букв и их звуки', letters: PHONICS_ORDER}
-    ];
-    groups.forEach((g, i) => {
-      html += `<div class="unit-card" onclick="startPhonicsCards(${i}, state.shuffleMode)">
-        <div class="unit-num" style="background:var(--purple)">${i+1}</div>
-        <div class="unit-info">
-          <h3>${g.name}</h3>
-          <p>${g.desc}</p>
-        </div>
-        <div class="unit-count">${g.letters.length}</div>
-      </div>`;
-    });
-  }
-
-  else if (section === 'blends') {
-    document.getElementById('headerTitle').textContent = 'Буквосочетания';
-    BLENDS.forEach((b, i) => {
-      html += `<div class="unit-card" onclick="startBlendCards(${i})">
-        <div class="unit-num" style="background:var(--orange);font-size:14px">${b.blend}</div>
-        <div class="unit-info">
-          <h3>${b.blend.toUpperCase()} ${b.sound}</h3>
-          <p>${b.words.join(', ')}</p>
-        </div>
-        <div class="unit-count">${b.words.length}</div>
-      </div>`;
-    });
-    html += `<div class="unit-card" onclick="startAllBlendCards()">
-      <div class="unit-num" style="background:var(--orange)">*</div>
-      <div class="unit-info">
-        <h3>Все сочетания</h3>
-        <p>Все слова с буквосочетаниями</p>
-      </div>
-    </div>`;
-  }
-
-  else if (section === 'reading') {
-    document.getElementById('headerTitle').textContent = 'Первые шаги к чтению';
-    READING_EXERCISES.forEach((ex, i) => {
-      html += `<div class="unit-card" onclick="startReadingExercise(${i})">
-        <div class="unit-num" style="background:var(--green);font-size:12px">${i+1}</div>
-        <div class="unit-info">
-          <h3>${ex.phoneme}</h3>
-          <p>${ex.words.substring(0,40)}...</p>
-        </div>
-      </div>`;
-    });
-  }
-
-  container.innerHTML = html;
-  render();
-}
-
-function openModuleSection(keysStr, label) {
-  const keys = keysStr.split(',');
-  state.currentSection = 'module';
-  state.history.push('menu');
-  state.screen = 'section';
-  document.getElementById('headerTitle').textContent = label;
-
-  const container = document.getElementById('sectionContent');
-  let html = '';
-
-  keys.forEach(key => {
-    const v = VOCABULARY[key];
-    if (!v) return;
-    html += `<div class="unit-card" onclick="startVocabCards('${key}')">
-      <div class="unit-num" style="background:${v.color || 'var(--grey)'};font-size:11px">${v.words.length}</div>
-      <div class="unit-info">
-        <h3>${v.name}</h3>
-        <p>${v.words.length} слов</p>
-      </div>
-      <div class="progress-badge" id="prog-${key}">0%</div>
-    </div>`;
-  });
-
-  // "All words" option
-  html += `<div class="unit-card" onclick="startAllModuleCards('${keysStr}')">
-    <div class="unit-num" style="background:var(--grey)">*</div>
-    <div class="unit-info">
-      <h3>Все слова модуля</h3>
-      <p>Повторить все слова</p>
-    </div>
-  </div>`;
-
-  container.innerHTML = html;
-  render();
-}
-
-// ═══════════════════════════════════════════════
-// CARD STARTERS
-// ═══════════════════════════════════════════════
-
-function startAlphabetCards(groupIdx, doShuffle) {
-  const groups = [
-    ALPHABET.slice(0,6), ALPHABET.slice(6,12),
-    ALPHABET.slice(12,18), ALPHABET.slice(18,26), [...ALPHABET]
-  ];
-  const cards = groups[groupIdx].map(a => ({
-    type: 'alphabet',
-    key: 'alphabet:' + a.lower,
-    front: `<div class="letter-big">${a.upper} ${a.lower}</div>`,
-    back: `<div class="letter-big">${a.upper} ${a.lower}</div>
-           <div class="letter-word"><span>${a.letter || a.lower}</span> - ${a.word}</div>
-           <div class="word-ru">${a.wordRu}</div>
-           <div class="word-transcription">${a.sound}</div>`
-  }));
-  startCards(cards, 'Алфавит', doShuffle);
-}
-
-function startPhonicsCards(groupIdx, doShuffle) {
-  const groups = [
-    PHONICS_ORDER.slice(0,6), PHONICS_ORDER.slice(6,12),
-    PHONICS_ORDER.slice(12,18), PHONICS_ORDER.slice(18,26), [...PHONICS_ORDER]
-  ];
-  const cards = groups[groupIdx].map(p => ({
-    type: 'phonics',
-    key: 'phonics:' + p.letter,
-    front: `<div class="card-label">Какой звук?</div>
-            <div class="letter-big">${p.letter}</div>`,
-    back: `<div class="letter-big" style="color:var(--purple)">${p.letter}</div>
-           <div class="word-transcription" style="font-size:28px">${p.sound}</div>
-           <div class="letter-word"><span>${p.letter}</span>${p.word.slice(1)}</div>
-           <div class="word-ru">${p.wordRu}</div>`
-  }));
-  startCards(cards, 'Звуки', doShuffle);
-}
-
-function startBlendCards(idx) {
-  const b = BLENDS[idx];
-  const cards = b.words.map((w, i) => ({
-    type: 'blend',
-    key: 'blend:' + b.blend + '_' + w,
-    front: `<div class="card-label">Прочитай</div>
-            <div class="blend-combo">${b.blend}</div>
-            <div class="blend-sound">${b.sound}</div>
-            <div class="example-word">${w}</div>`,
-    back: `<div class="blend-combo">${b.blend}</div>
-           <div class="example-word">${w}</div>
-           <div class="word-ru">${b.wordsRu[i]}</div>`
-  }));
-  startCards(cards, b.blend.toUpperCase());
-}
-
-function startAllBlendCards() {
-  let cards = [];
-  BLENDS.forEach(b => {
-    b.words.forEach((w, i) => {
-      cards.push({
-        type: 'blend',
-        key: 'blend:' + b.blend + '_' + w,
-        front: `<div class="card-label">Прочитай</div>
-                <div class="blend-combo">${b.blend}</div>
-                <div class="example-word">${w}</div>`,
-        back: `<div class="blend-combo">${b.blend}</div>
-               <div class="blend-sound">${b.sound}</div>
-               <div class="example-word">${w}</div>
-               <div class="word-ru">${b.wordsRu[i]}</div>`
-      });
-    });
-  });
-  shuffle(cards);
-  startCards(cards, 'Все сочетания');
-}
-
-function startVocabCards(key) {
-  const v = VOCABULARY[key];
-  const cards = v.words.map(([en, ru]) => ({
-    type: 'vocab',
-    key: 'vocab_' + key + ':' + en,
-    front: `<div class="card-label">Переведи</div>
-            <div class="word-en">${en}</div>`,
-    back: `<div class="word-en">${en}</div>
-           <div class="word-ru">${ru}</div>`
-  }));
-  startCards(cards, v.name, true);
-}
-
-function startAllModuleCards(keysStr) {
-  const keys = keysStr.split(',');
-  let cards = [];
-  keys.forEach(key => {
-    const v = VOCABULARY[key];
-    if (!v) return;
-    v.words.forEach(([en, ru]) => {
-      cards.push({
-        type: 'vocab',
-        key: 'vocab_' + key + ':' + en,
-        front: `<div class="card-label">Переведи</div>
-                <div class="word-en">${en}</div>`,
-        back: `<div class="word-en">${en}</div>
-               <div class="word-ru">${ru}</div>`
-      });
-    });
-  });
-  startCards(cards, 'Все слова', true);
-}
-
-function startReadingExercise(idx) {
-  const ex = READING_EXERCISES[idx];
-  state.history.push(state.screen);
-  state.screen = 'cards';
-  document.getElementById('headerTitle').textContent = ex.phoneme;
-
-  let html = '<div class="flashcard-view"><div class="flashcard-container">';
-  html += '<div class="reading-card">';
-  html += `<div class="phoneme">${ex.phoneme}</div>`;
-  html += `<div class="word-list-reading">${ex.words}</div>`;
-  if (ex.words2) {
-    html += `<hr style="margin:16px 0;border:none;border-top:1px solid #eee">`;
-    html += `<div class="word-list-reading">${ex.words2}</div>`;
-  }
-  if (ex.pyramid) {
-    html += `<div class="mini-text">`;
-    ex.pyramid.forEach(line => {
-      html += line + '<br>';
-    });
-    html += '</div>';
-  }
-  html += '</div></div></div>';
-
-  document.getElementById('flashcardContent').innerHTML = html;
-  render();
-}
-
-// ═══════════════════════════════════════════════
-// CARD ENGINE
-// ═══════════════════════════════════════════════
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function startCards(cards, title, doShuffle) {
-  if (doShuffle) {
-    shuffle(cards);
-  } else {
-    // Sort by Leitner box (lower box = needs more practice)
-    cards.sort((a, b) => getCardBox(a.key) - getCardBox(b.key));
-  }
-
-  state.history.push(state.screen);
-  state.screen = 'cards';
-  state.currentCards = cards;
-  state.currentIndex = 0;
-  state.showAnswer = false;
-  state.sessionKnow = 0;
-  state.sessionDontKnow = 0;
-  document.getElementById('headerTitle').textContent = title;
-  renderCard();
-  render();
-}
-
-function renderCard() {
-  const container = document.getElementById('flashcardContent');
-
-  if (state.currentIndex >= state.currentCards.length) {
-    // Session complete
-    const total = state.sessionKnow + state.sessionDontKnow;
-    container.innerHTML = `
-      <div class="completion">
-        <div class="emoji">${state.sessionDontKnow === 0 ? '&#127942;' : '&#128170;'}</div>
-        <h2>${state.sessionDontKnow === 0 ? 'Отлично!' : 'Хорошая работа!'}</h2>
-        <p>Сессия завершена</p>
-        <div class="stats-line">
-          <div><div class="num" style="color:var(--green)">${state.sessionKnow}</div><div class="label">Знаю</div></div>
-          <div><div class="num" style="color:var(--red)">${state.sessionDontKnow}</div><div class="label">Учу</div></div>
-          <div><div class="num" style="color:var(--blue)">${total}</div><div class="label">Всего</div></div>
-        </div>
-        ${state.sessionDontKnow > 0 ? '<button class="restart-btn" onclick="restartWrong()">Повторить ошибки</button>' : ''}
-        <br><button class="restart-btn" style="background:var(--blue);margin-top:12px" onclick="restartAll()">Заново</button>
-        <br><button class="restart-btn" style="background:#666;margin-top:12px" onclick="goBack()">Назад</button>
-      </div>`;
-    return;
-  }
-
-  const card = state.currentCards[state.currentIndex];
-  const box = getCardBox(card.key);
-  const total = state.currentCards.length;
-  const idx = state.currentIndex;
-
-  let boxDots = '';
-  for (let i = 1; i <= 3; i++) {
-    boxDots += `<div class="box-dot ${i < box ? 'filled' : ''} ${i === box ? 'current' : ''}"></div>`;
-  }
-
-  let html = `
-    <div class="card-progress">
-      <div class="bar"><div class="bar-fill" style="width:${(idx/total)*100}%"></div></div>
-      <div class="count">${idx + 1} / ${total}</div>
-    </div>
-    <div class="flashcard-container">
-      <div class="flashcard ${state.showAnswer ? 'flip' : ''}" onclick="${!state.showAnswer ? 'showAnswer()' : ''}">
-        <div class="box-indicator">${boxDots}</div>
-        ${state.showAnswer ? card.back : card.front}
-      </div>`;
-
-  if (!state.showAnswer) {
-    html += `<button class="check-btn" onclick="showAnswer()">Проверить</button>`;
-  } else {
-    html += `<div class="answer-btns">
-      <button class="btn-dont-know" onclick="answerCard(false)">Не знаю</button>
-      <button class="btn-know" onclick="answerCard(true)">Знаю!</button>
-    </div>`;
-  }
-
-  html += '</div>';
-  container.innerHTML = html;
-}
-
-function showAnswer() {
-  state.showAnswer = true;
-  renderCard();
-}
-
-function answerCard(know) {
-  const card = state.currentCards[state.currentIndex];
-  updateCardBox(card.key, know);
-
-  if (know) {
-    state.sessionKnow++;
-  } else {
-    state.sessionDontKnow++;
-    // Add card back to end for repeat
-    state.currentCards.push(card);
-  }
-
-  state.currentIndex++;
-  state.showAnswer = false;
-  renderCard();
-}
-
-function restartWrong() {
-  // Filter cards that are still in box 1
-  const wrongCards = state.currentCards.filter(c => getCardBox(c.key) === 1);
-  if (wrongCards.length === 0) { goBack(); return; }
-  state.currentCards = wrongCards;
-  state.currentIndex = 0;
-  state.showAnswer = false;
-  state.sessionKnow = 0;
-  state.sessionDontKnow = 0;
-  renderCard();
-}
-
-function restartAll() {
-  state.currentIndex = 0;
-  state.showAnswer = false;
-  state.sessionKnow = 0;
-  state.sessionDontKnow = 0;
-  shuffle(state.currentCards);
-  renderCard();
-}
-
-// ═══════════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════════
-
-function goBack() {
-  const prev = state.history.pop();
-  if (prev === 'menu' || !prev) {
-    state.screen = 'menu';
-    document.getElementById('headerTitle').textContent = 'Spotlight 2';
-  } else if (prev === 'section') {
-    state.screen = 'section';
-  } else {
-    state.screen = prev;
-  }
-  render();
-}
-
-// ═══════════════════════════════════════════════
-// STATS
-// ═══════════════════════════════════════════════
-
-function showStats() {
-  const p = loadProgress();
-  let totalCards = 0, box1 = 0, box2 = 0, box3 = 0;
-  for (const k in p) {
-    totalCards++;
-    const b = p[k].box || 1;
-    if (b === 1) box1++;
-    else if (b === 2) box2++;
-    else box3++;
-  }
-
-  const modal = document.getElementById('statsContent');
-  modal.innerHTML = `
-    <h2>Статистика</h2>
-    <div class="stat-row">
-      <span class="stat-label">Всего изучено карточек</span>
-      <span class="stat-value">${totalCards}</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label" style="color:var(--red)">&#128308; Учу (коробка 1)</span>
-      <span class="stat-value">${box1}</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label" style="color:var(--orange)">&#128992; Повторяю (коробка 2)</span>
-      <span class="stat-value">${box2}</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label" style="color:var(--green)">&#128994; Знаю (коробка 3)</span>
-      <span class="stat-value">${box3}</span>
-    </div>
-    <button class="close-btn" onclick="closeStats()">Закрыть</button>
-    <button class="reset-btn" onclick="resetProgress()">Сбросить весь прогресс</button>
-  `;
-  document.getElementById('statsModal').classList.add('active');
-}
-
-function closeStats() {
-  document.getElementById('statsModal').classList.remove('active');
-}
-
-function resetProgress() {
-  if (confirm('Сбросить весь прогресс? Это действие нельзя отменить.')) {
-    localStorage.removeItem('spotlight2_progress');
-    closeStats();
-    updateProgressBadges();
-  }
-}
-
-// Click outside modal to close
-document.getElementById('statsModal').addEventListener('click', function(e) {
-  if (e.target === this) closeStats();
-});
-
-// ═══════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════
-
-buildModuleCards();
-render();
-</script>
+  <div class="footer">Сделано для учёбы 💙</div>
 </body>
 </html>
