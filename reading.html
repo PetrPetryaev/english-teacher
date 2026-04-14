@@ -290,8 +290,12 @@ body {
   border-radius: 4px;
 }
 .reading-text.pickable .word { cursor: pointer; touch-action: manipulation; }
-.reading-text.pickable .word:active { background: var(--orange); color: white; }
+.reading-text.pickable .word:active { background: var(--orange-light); }
 .reading-text.pickable .word:hover { background: var(--orange-light); }
+.reading-text.pickable .word.selected,
+.reading-text.pickable .word.selected:hover { background: var(--orange); color: white; }
+.big-btn:disabled { opacity: 0.45; cursor: default; box-shadow: none; }
+.big-btn:disabled:active { transform: none; }
 
 .tip {
   background: var(--purple-light);
@@ -497,8 +501,9 @@ body {
 
 <!-- ─── PICKER (after timer) ─── -->
 <div class="screen" id="screen-picker">
-  <div class="tip">👆 Тапни на слово, на котором ты остановился.</div>
+  <div class="tip">👆 Тапни на слово, на котором ты остановился, потом нажми «Подтвердить».</div>
   <div class="reading-text pickable" id="readingTextPickable"></div>
+  <button class="big-btn" id="confirmPickBtn" type="button" disabled>Подтвердить</button>
 </div>
 
 <!-- ─── RSVP ─── -->
@@ -801,9 +806,11 @@ body {
         span.textContent = t.text;
         if (clickable) {
           span.onclick = () => {
-            const wr = wordsReadUpTo(i);
-            const elapsedSec = (game.endTime - game.startTime) / 1000;
-            showResult(wr, elapsedSec);
+            // Just mark the selection; confirm button commits it.
+            el.querySelectorAll('.word.selected').forEach(s => s.classList.remove('selected'));
+            span.classList.add('selected');
+            game.pickedIdx = i;
+            $('confirmPickBtn').disabled = false;
           };
         }
         el.appendChild(span);
@@ -815,9 +822,18 @@ body {
   }
 
   function goToPicker() {
+    game.pickedIdx = null;
+    $('confirmPickBtn').disabled = true;
     renderReadingText($('readingTextPickable'), true);
     show('screen-picker');
   }
+
+  $('confirmPickBtn').onclick = () => {
+    if (game.pickedIdx == null) return;
+    const wr = wordsReadUpTo(game.pickedIdx);
+    const elapsedSec = (game.endTime - game.startTime) / 1000;
+    showResult(wr, elapsedSec);
+  };
 
   // ─── Result ─────────────────────────────
   function showResult(wordsRead, elapsedSec) {
