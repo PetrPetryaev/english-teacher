@@ -5,20 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Состав числа — Тренажёр</title>
+<title>Микс составов чисел — Тренажёр</title>
 <style>
 :root {
+  --teal: #009688;
+  --teal-dark: #00695C;
+  --teal-light: #e0f2f1;
   --green: #4CAF50;
-  --green-dark: #2E7D32;
   --green-light: #e8f5e9;
   --pink: #e91e8c;
-  --pink-light: #fce4f3;
   --orange: #FF9800;
   --orange-light: #fff3e0;
   --blue: #2196F3;
   --blue-light: #e3f2fd;
-  --purple: #9C27B0;
-  --purple-light: #f3e5f5;
   --red: #f44336;
   --red-light: #ffebee;
   --bg: #fafafa;
@@ -38,9 +37,8 @@ body {
   touch-action: manipulation;
 }
 
-/* Header */
 .header {
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
   color: white;
   padding: 14px 16px;
   display: flex;
@@ -84,38 +82,12 @@ body {
 }
 .section-title:first-child { margin-top: 4px; }
 
-/* Target number selector (5..10) */
 .targets {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-}
-.target-btn {
-  background: white;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 14px 0;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--card-shadow);
-  transition: all 0.15s;
-  color: #333;
-}
-.target-btn.active {
-  background: var(--green);
-  color: white;
-  border-color: var(--green-dark);
-  transform: scale(1.05);
-}
-
-/* First-addend selector grid */
-.addends {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
-.add-btn {
+.target-btn {
   background: white;
   border: 2px solid transparent;
   border-radius: 12px;
@@ -127,21 +99,17 @@ body {
   transition: all 0.15s;
   color: #333;
 }
-.add-btn:active { transform: scale(0.96); }
-.add-btn.active {
-  background: var(--green);
+.target-btn:active { transform: scale(0.96); }
+.target-btn.active {
+  background: var(--teal);
   color: white;
-  border-color: var(--green-dark);
+  border-color: var(--teal-dark);
   transform: scale(1.05);
-}
-.add-btn.disabled {
-  opacity: 0.35;
-  cursor: default;
 }
 
 .preset-btns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-top: 10px;
 }
@@ -155,9 +123,8 @@ body {
   cursor: pointer;
   color: #555;
 }
-.preset-btn:active { background: var(--green-light); }
+.preset-btn:active { background: var(--teal-light); }
 
-/* Toggle groups */
 .toggle-group {
   display: flex;
   background: white;
@@ -178,25 +145,24 @@ body {
   transition: all 0.15s;
 }
 .toggle-btn.active {
-  background: var(--green);
+  background: var(--teal);
   color: white;
   font-weight: 600;
 }
 
-/* Big buttons */
 .big-btn {
   display: block;
   width: 100%;
   padding: 17px;
   margin-top: 12px;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  background: linear-gradient(135deg, var(--teal), var(--teal-dark));
   color: white;
   border: none;
   border-radius: var(--radius);
   font-size: 17px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25);
+  box-shadow: 0 4px 16px rgba(0, 150, 136, 0.25);
 }
 .big-btn:active { transform: scale(0.98); }
 .big-btn.first { margin-top: 24px; }
@@ -209,7 +175,6 @@ body {
   box-shadow: 0 4px 16px rgba(255, 152, 0, 0.25);
 }
 
-/* Training */
 .progress-bar {
   height: 8px;
   background: #e5e5e5;
@@ -219,7 +184,7 @@ body {
 }
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--blue));
+  background: linear-gradient(90deg, var(--teal), var(--blue));
   transition: width 0.3s;
   width: 0;
 }
@@ -247,7 +212,6 @@ body {
   letter-spacing: 2px;
 }
 .question-text .op { color: var(--pink); margin: 0 6px; }
-.question-text .q { color: var(--orange); }
 .question-text .blank {
   display: inline-block;
   min-width: 64px;
@@ -300,76 +264,6 @@ body {
   80% { transform: translateX(6px); }
 }
 
-.hint-btn {
-  display: block;
-  width: 100%;
-  padding: 14px;
-  margin-top: 18px;
-  background: var(--orange-light);
-  color: #E65100;
-  border: 2px solid var(--orange);
-  border-radius: var(--radius);
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.hint-btn:active { background: var(--orange); color: white; }
-
-/* Modal */
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-  padding: 16px;
-}
-.modal.active { display: flex; animation: fadeIn 0.2s; }
-.modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: 22px;
-  max-width: 380px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-.modal-title {
-  font-size: 19px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  text-align: center;
-  color: var(--green-dark);
-}
-.pair-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 11px 16px;
-  margin: 5px 0;
-  background: var(--green-light);
-  border-radius: 10px;
-  font-size: 17px;
-  font-weight: 600;
-  color: #1B5E20;
-}
-.modal .close-btn {
-  display: block;
-  width: 100%;
-  padding: 14px;
-  margin-top: 14px;
-  background: var(--green);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* Results */
 .result-card {
   background: white;
   border-radius: var(--radius);
@@ -386,15 +280,13 @@ body {
   gap: 10px;
   margin-bottom: 10px;
 }
-.result-stat {
-  padding: 14px 6px;
-  border-radius: 12px;
-}
+.result-stat { padding: 14px 6px; border-radius: 12px; }
 .result-stat.green { background: var(--green-light); color: #1B5E20; }
 .result-stat.red { background: var(--red-light); color: #B71C1C; }
 .result-stat.blue { background: var(--blue-light); color: #0D47A1; }
 .result-stat-value { font-size: 26px; font-weight: 700; }
 .result-stat-label { font-size: 11px; font-weight: 500; margin-top: 2px; }
+
 .mistakes-list { margin-top: 18px; text-align: left; }
 .mistakes-list h3 { font-size: 13px; color: #888; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .mistake-item {
@@ -412,7 +304,6 @@ body {
   font-weight: 400;
 }
 
-/* Study */
 .study-col {
   background: white;
   border-radius: var(--radius);
@@ -423,7 +314,7 @@ body {
 .study-col h3 {
   font-size: 19px;
   margin-bottom: 10px;
-  color: var(--green-dark);
+  color: var(--teal-dark);
   font-weight: 700;
 }
 .study-row {
@@ -431,21 +322,11 @@ body {
   justify-content: space-between;
   padding: 9px 14px;
   margin: 4px 0;
-  background: var(--green-light);
+  background: var(--teal-light);
   border-radius: 8px;
   font-size: 16px;
   font-weight: 500;
-  color: #1B5E20;
-}
-
-.tip {
-  background: var(--green-light);
-  color: #1B5E20;
-  padding: 11px 14px;
-  border-radius: 12px;
-  font-size: 13px;
-  line-height: 1.4;
-  margin-top: 6px;
+  color: #004D40;
 }
 
 .intro {
@@ -461,35 +342,27 @@ body {
 
 <div class="header">
   <button class="icon-btn" id="backBtn">←</button>
-  <h1 id="headerTitle">Состав числа</h1>
+  <h1 id="headerTitle">Микс составов 2-10</h1>
   <button class="icon-btn hidden" id="rightBtn"></button>
 </div>
 
 <!-- MENU -->
 <div class="screen active" id="screen-menu">
-  <div class="intro">Сколько не хватает до 10? 💪</div>
+  <div class="intro">Все составы вперемешку: 6+?=8, 3+?=7, 2+?=10 — на скорость!</div>
 
-  <div class="section-title">До какого числа считаем?</div>
+  <div class="section-title">Какие числа учим?</div>
   <div class="targets" id="targetButtons"></div>
-
-  <div class="section-title">Какие первые слагаемые?</div>
-  <div class="addends" id="addendButtons"></div>
   <div class="preset-btns">
-    <button class="preset-btn" data-preset="all">Все</button>
-    <button class="preset-btn" data-preset="hard">Сложные</button>
-  </div>
-
-  <div class="section-title">Порядок</div>
-  <div class="toggle-group" id="modeToggle">
-    <button class="toggle-btn active" data-value="order">По порядку</button>
-    <button class="toggle-btn" data-value="random">Случайно</button>
+    <button class="preset-btn" data-preset="all">Все 2-10</button>
+    <button class="preset-btn" data-preset="easy">Лёгкие 2-5</button>
+    <button class="preset-btn" data-preset="hard">Сложные 6-10</button>
   </div>
 
   <div class="section-title">Сколько примеров?</div>
   <div class="toggle-group" id="countToggle">
     <button class="toggle-btn" data-value="10">10</button>
     <button class="toggle-btn active" data-value="20">20</button>
-    <button class="toggle-btn" data-value="all">Все</button>
+    <button class="toggle-btn" data-value="40">40</button>
   </div>
 
   <button class="big-btn first" id="startBtn">🚀 Начать тренировку</button>
@@ -553,13 +426,12 @@ body {
 
 <script>
 (function(){
-  const SAVE_KEY = 'composition-trainer-v1';
-  const defaults = { target: 10, addends: [1,2,3,4,5,6,7,8,9], mode: 'order', count: 20 };
+  const SAVE_KEY = 'composition-mix-v1';
+  const defaults = { targets: [2,3,4,5,6,7,8,9,10], count: 20 };
   const state = Object.assign({}, defaults, loadSettings());
-  // Validate
-  if (typeof state.target !== 'number' || state.target < 5 || state.target > 10) state.target = 10;
-  if (!Array.isArray(state.addends)) state.addends = defaults.addends;
-  state.addends = state.addends.filter(n => Number.isInteger(n) && n >= 1 && n < state.target);
+  if (!Array.isArray(state.targets)) state.targets = defaults.targets.slice();
+  state.targets = state.targets.filter(n => Number.isInteger(n) && n >= 2 && n <= 10);
+  if (state.targets.length === 0) state.targets = defaults.targets.slice();
 
   const game = {
     questions: [], idx: 0, correct: 0, wrong: 0,
@@ -572,7 +444,7 @@ body {
   }
   function saveSettings() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify({
-      target: state.target, addends: state.addends, mode: state.mode, count: state.count
+      targets: state.targets, count: state.count
     })); } catch (e) {}
   }
 
@@ -581,12 +453,12 @@ body {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     $(id).classList.add('active');
     const titles = {
-      'screen-menu': 'Состав числа',
+      'screen-menu': 'Микс составов 2-10',
       'screen-training': 'Тренировка',
       'screen-study': 'Изучи пары',
       'screen-results': 'Результаты'
     };
-    $('headerTitle').textContent = titles[id] || 'Состав числа';
+    $('headerTitle').textContent = titles[id] || 'Микс составов 2-10';
     window.scrollTo(0, 0);
   }
   function shuffle(arr) {
@@ -597,77 +469,37 @@ body {
     }
     return a;
   }
+  const rnd = arr => arr[Math.floor(Math.random() * arr.length)];
 
-  // Targets (5..10)
   function renderTargets() {
     const c = $('targetButtons');
     c.innerHTML = '';
-    for (let t = 5; t <= 10; t++) {
+    for (let t = 2; t <= 10; t++) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'target-btn' + (t === state.target ? ' active' : '');
+      b.className = 'target-btn' + (state.targets.includes(t) ? ' active' : '');
       b.textContent = t;
       b.onclick = () => {
-        state.target = t;
-        // Filter addends to those < new target
-        state.addends = state.addends.filter(n => n < t);
-        if (state.addends.length === 0) {
-          // Default to all for this target
-          state.addends = [];
-          for (let i = 1; i < t; i++) state.addends.push(i);
-        }
+        if (state.targets.includes(t)) state.targets = state.targets.filter(x => x !== t);
+        else state.targets = state.targets.concat(t).sort((a,b) => a - b);
         saveSettings();
         renderTargets();
-        renderAddends();
       };
       c.appendChild(b);
     }
   }
 
-  // Addends 1..target-1
-  function renderAddends() {
-    const c = $('addendButtons');
-    c.innerHTML = '';
-    for (let n = 1; n <= 9; n++) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      if (n >= state.target) {
-        b.className = 'add-btn disabled';
-        b.textContent = n;
-        b.disabled = true;
-      } else {
-        b.className = 'add-btn' + (state.addends.includes(n) ? ' active' : '');
-        b.textContent = n;
-        b.onclick = () => {
-          if (state.addends.includes(n)) state.addends = state.addends.filter(x => x !== n);
-          else state.addends = state.addends.concat(n).sort((a,b) => a - b);
-          saveSettings();
-          renderAddends();
-        };
-      }
-      c.appendChild(b);
-    }
-  }
-
-  // Presets
   document.querySelectorAll('.preset-btn').forEach(b => {
     b.onclick = () => {
       const p = b.dataset.preset;
-      const all = [];
-      for (let i = 1; i < state.target; i++) all.push(i);
-      if (p === 'all') state.addends = all;
-      else if (p === 'hard') {
-        // "Hard" = upper half of addends
-        const half = Math.ceil((state.target - 1) / 2);
-        state.addends = all.filter(n => n > half);
-        if (state.addends.length === 0) state.addends = all;
-      }
+      if (p === 'all') state.targets = [2,3,4,5,6,7,8,9,10];
+      else if (p === 'easy') state.targets = [2,3,4,5];
+      else if (p === 'hard') state.targets = [6,7,8,9,10];
       saveSettings();
-      renderAddends();
+      renderTargets();
     };
   });
 
-  // Toggles
   function setupToggle(groupId, key, parser) {
     const g = $(groupId);
     g.querySelectorAll('.toggle-btn').forEach(b => {
@@ -683,33 +515,31 @@ body {
       saveSettings();
     });
   }
-  setupToggle('modeToggle', 'mode');
-  setupToggle('countToggle', 'count', v => v === 'all' ? 'all' : parseInt(v));
+  setupToggle('countToggle', 'count', v => parseInt(v));
 
-  // Start
   $('startBtn').onclick = () => {
-    if (state.addends.length === 0) {
-      alert('Выбери хотя бы одно первое слагаемое');
+    if (state.targets.length === 0) {
+      alert('Выбери хотя бы одно число');
       return;
     }
     startGame();
   };
 
   function generateQuestions() {
-    let qs = [];
-    for (const a of state.addends) {
-      qs.push({ a: a, target: state.target });
+    const qs = [];
+    // Build all valid (a, target) pairs from selected targets, then mix.
+    const allPairs = [];
+    for (const t of state.targets) {
+      for (let a = 1; a < t; a++) allPairs.push({ a, target: t });
     }
-    if (state.mode === 'random') qs = shuffle(qs);
-    if (state.count !== 'all') {
-      // Tile/repeat to fill the count
-      const needed = state.count;
-      let out = [];
-      while (out.length < needed) {
-        const batch = state.mode === 'random' ? shuffle(qs) : qs;
-        out = out.concat(batch);
+    if (allPairs.length === 0) return [];
+    // Always random for the mix trainer; tile across all pairs to fill count.
+    while (qs.length < state.count) {
+      const batch = shuffle(allPairs);
+      for (const p of batch) {
+        qs.push(p);
+        if (qs.length >= state.count) break;
       }
-      qs = out.slice(0, needed);
     }
     return qs;
   }
@@ -730,12 +560,10 @@ body {
   function genOptions(a, target) {
     const correct = target - a;
     const pool = new Set([correct]);
-    // Plausible: near-correct values in 1..9
     for (const d of [-2, -1, 1, 2]) {
       const v = correct + d;
       if (v >= 1 && v <= 9 && v !== correct) pool.add(v);
     }
-    // Fill up to 4
     let safety = 0;
     while (pool.size < 4 && safety++ < 30) {
       const v = Math.floor(Math.random() * 9) + 1;
@@ -785,7 +613,7 @@ body {
       game.correct++;
       game.streak++;
       if (game.streak > game.maxStreak) game.maxStreak = game.streak;
-      setTimeout(next, 750);
+      setTimeout(next, 700);
     } else {
       btn.classList.add('wrong');
       buttons.forEach(b => {
@@ -795,7 +623,7 @@ body {
       game.wrong++;
       game.streak = 0;
       game.mistakes.push({ a: q.a, target: q.target, correct: correct, user: val });
-      setTimeout(next, 1700);
+      setTimeout(next, 1600);
     }
     updateStats();
   }
@@ -806,7 +634,6 @@ body {
     renderQuestion();
   }
 
-  // Results
   function showResults() {
     $('resCorrect').textContent = game.correct;
     $('resWrong').textContent = game.wrong;
@@ -840,24 +667,25 @@ body {
   $('restartBtn').onclick = startGame;
   $('menuBtn').onclick = () => show('screen-menu');
 
-  // Study
   $('studyBtn').onclick = () => {
     const cont = $('studyContent');
     cont.innerHTML = '';
-    const col = document.createElement('div');
-    col.className = 'study-col';
-    col.innerHTML = `<h3>Состав числа ${state.target}</h3>`;
-    for (let i = 1; i < state.target; i++) {
-      const row = document.createElement('div');
-      row.className = 'study-row';
-      row.innerHTML = `<span>${i} + ${state.target - i}</span><span>= ${state.target}</span>`;
-      col.appendChild(row);
-    }
-    cont.appendChild(col);
+    const ts = state.targets.length ? state.targets : [2,3,4,5,6,7,8,9,10];
+    ts.forEach(t => {
+      const col = document.createElement('div');
+      col.className = 'study-col';
+      col.innerHTML = `<h3>Состав числа ${t}</h3>`;
+      for (let i = 1; i < t; i++) {
+        const row = document.createElement('div');
+        row.className = 'study-row';
+        row.innerHTML = `<span>${i} + ${t - i}</span><span>= ${t}</span>`;
+        col.appendChild(row);
+      }
+      cont.appendChild(col);
+    });
     show('screen-study');
   };
 
-  // Back
   $('backBtn').onclick = () => {
     const active = document.querySelector('.screen.active').id;
     if (active === 'screen-menu') {
@@ -870,7 +698,6 @@ body {
     show('screen-menu');
   };
 
-  // Keyboard
   document.addEventListener('keydown', e => {
     if (document.querySelector('.screen.active').id !== 'screen-training') return;
     if (['1','2','3','4'].includes(e.key)) {
@@ -883,9 +710,7 @@ body {
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   window.scrollTo(0, 0);
 
-  // Init
   renderTargets();
-  renderAddends();
 })();
 </script>
 </body>

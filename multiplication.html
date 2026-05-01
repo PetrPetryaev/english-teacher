@@ -470,8 +470,6 @@ body {
     <button class="toggle-btn" data-value="all">Все</button>
   </div>
 
-  <div class="tip">💡 В тренировке всегда есть кнопка <b>«Подсказка»</b> — показывает всю таблицу с нужным множителем.</div>
-
   <button class="big-btn first" id="startBtn">🚀 Начать тренировку</button>
   <button class="big-btn orange" id="studyBtn">📖 Изучить таблицу</button>
 </div>
@@ -499,8 +497,6 @@ body {
   </div>
 
   <div class="answers" id="answers"></div>
-
-  <button class="hint-btn" id="hintBtn">💡 Показать подсказку</button>
 </div>
 
 <!-- ─── STUDY ─── -->
@@ -531,15 +527,6 @@ body {
   </div>
   <button class="big-btn" id="restartBtn">🔁 Ещё раз</button>
   <button class="big-btn pink" id="menuBtn">🏠 В меню</button>
-</div>
-
-<!-- ─── HINT MODAL ─── -->
-<div class="modal" id="hintModal">
-  <div class="modal-content">
-    <div class="modal-title" id="hintTitle">Таблица</div>
-    <div id="hintTable"></div>
-    <button class="close-btn" id="closeHint">Понятно!</button>
-  </div>
 </div>
 
 <script>
@@ -762,26 +749,6 @@ body {
     renderQuestion();
   }
 
-  // ─── Hint modal ────────────────────────
-  $('hintBtn').onclick = () => {
-    const q = game.currentQ;
-    if (!q) return;
-    $('hintTitle').textContent = `Умножение на ${q.a}`;
-    const t = $('hintTable');
-    t.innerHTML = '';
-    for (let i = 1; i <= 10; i++) {
-      const row = document.createElement('div');
-      row.className = 'mult-table-row';
-      row.innerHTML = `<span>${q.a} × ${i}</span><span>= ${q.a * i}</span>`;
-      t.appendChild(row);
-    }
-    $('hintModal').classList.add('active');
-  };
-  $('closeHint').onclick = () => $('hintModal').classList.remove('active');
-  $('hintModal').onclick = e => {
-    if (e.target === $('hintModal')) $('hintModal').classList.remove('active');
-  };
-
   // ─── Results ───────────────────────────
   function showResults() {
     $('resCorrect').textContent = game.correct;
@@ -840,10 +807,6 @@ body {
 
   // ─── Back button ───────────────────────
   $('backBtn').onclick = () => {
-    if ($('hintModal').classList.contains('active')) {
-      $('hintModal').classList.remove('active');
-      return;
-    }
     const active = document.querySelector('.screen.active').id;
     if (active === 'screen-menu') return;
     if (active === 'screen-training') {
@@ -855,14 +818,6 @@ body {
   // ─── Keyboard (for desktop convenience) ──
   document.addEventListener('keydown', e => {
     if (document.querySelector('.screen.active').id !== 'screen-training') return;
-    if ($('hintModal').classList.contains('active')) {
-      if (e.key === 'Escape') $('hintModal').classList.remove('active');
-      return;
-    }
-    if (e.key === 'h' || e.key === 'H' || e.key === 'р' || e.key === 'Р') {
-      $('hintBtn').click();
-      return;
-    }
     if (['1','2','3','4'].includes(e.key)) {
       const i = parseInt(e.key, 10) - 1;
       const btns = document.querySelectorAll('#answers .answer-btn');
