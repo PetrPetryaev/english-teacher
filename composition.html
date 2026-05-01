@@ -84,38 +84,13 @@ body {
 }
 .section-title:first-child { margin-top: 4px; }
 
-/* Target number selector (5..10) */
+/* Target numbers selector (2..10, multi-select) */
 .targets {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 8px;
-}
-.target-btn {
-  background: white;
-  border: 2px solid transparent;
-  border-radius: 12px;
-  padding: 14px 0;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: var(--card-shadow);
-  transition: all 0.15s;
-  color: #333;
-}
-.target-btn.active {
-  background: var(--green);
-  color: white;
-  border-color: var(--green-dark);
-  transform: scale(1.05);
-}
-
-/* First-addend selector grid */
-.addends {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 8px;
 }
-.add-btn {
+.target-btn {
   background: white;
   border: 2px solid transparent;
   border-radius: 12px;
@@ -127,21 +102,17 @@ body {
   transition: all 0.15s;
   color: #333;
 }
-.add-btn:active { transform: scale(0.96); }
-.add-btn.active {
+.target-btn:active { transform: scale(0.96); }
+.target-btn.active {
   background: var(--green);
   color: white;
   border-color: var(--green-dark);
   transform: scale(1.05);
 }
-.add-btn.disabled {
-  opacity: 0.35;
-  cursor: default;
-}
 
 .preset-btns {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-top: 10px;
 }
@@ -467,16 +438,14 @@ body {
 
 <!-- MENU -->
 <div class="screen active" id="screen-menu">
-  <div class="intro">Сколько не хватает до 10? 💪</div>
+  <div class="intro">Сколько не хватает до нужного числа? 💪</div>
 
-  <div class="section-title">До какого числа считаем?</div>
+  <div class="section-title">Какие числа учим?</div>
   <div class="targets" id="targetButtons"></div>
-
-  <div class="section-title">Какие первые слагаемые?</div>
-  <div class="addends" id="addendButtons"></div>
   <div class="preset-btns">
-    <button class="preset-btn" data-preset="all">Все</button>
-    <button class="preset-btn" data-preset="hard">Сложные</button>
+    <button class="preset-btn" data-preset="all">Все 2-10</button>
+    <button class="preset-btn" data-preset="easy">Лёгкие 2-5</button>
+    <button class="preset-btn" data-preset="hard">Сложные 6-10</button>
   </div>
 
   <div class="section-title">Порядок</div>
@@ -553,13 +522,13 @@ body {
 
 <script>
 (function(){
-  const SAVE_KEY = 'composition-trainer-v1';
-  const defaults = { target: 10, addends: [1,2,3,4,5,6,7,8,9], mode: 'order', count: 20 };
+  const SAVE_KEY = 'composition-trainer-v2';
+  const defaults = { targets: [10], mode: 'order', count: 20 };
   const state = Object.assign({}, defaults, loadSettings());
-  // Validate
-  if (typeof state.target !== 'number' || state.target < 5 || state.target > 10) state.target = 10;
-  if (!Array.isArray(state.addends)) state.addends = defaults.addends;
-  state.addends = state.addends.filter(n => Number.isInteger(n) && n >= 1 && n < state.target);
+  // Validate: targets must be a non-empty array of integers 2..10
+  if (!Array.isArray(state.targets)) state.targets = defaults.targets.slice();
+  state.targets = state.targets.filter(n => Number.isInteger(n) && n >= 2 && n <= 10);
+  if (state.targets.length === 0) state.targets = [10];
 
   const game = {
     questions: [], idx: 0, correct: 0, wrong: 0,
@@ -572,7 +541,7 @@ body {
   }
   function saveSettings() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify({
-      target: state.target, addends: state.addends, mode: state.mode, count: state.count
+      targets: state.targets, mode: state.mode, count: state.count
     })); } catch (e) {}
   }
 
@@ -598,53 +567,23 @@ body {
     return a;
   }
 
-  // Targets (5..10)
+  // Targets 2..10 — multi-select. Pick one for focused practice or
+  // several to mix targets in one session.
   function renderTargets() {
     const c = $('targetButtons');
     c.innerHTML = '';
-    for (let t = 5; t <= 10; t++) {
+    for (let t = 2; t <= 10; t++) {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'target-btn' + (t === state.target ? ' active' : '');
+      b.className = 'target-btn' + (state.targets.includes(t) ? ' active' : '');
       b.textContent = t;
       b.onclick = () => {
-        state.target = t;
-        // Filter addends to those < new target
-        state.addends = state.addends.filter(n => n < t);
-        if (state.addends.length === 0) {
-          // Default to all for this target
-          state.addends = [];
-          for (let i = 1; i < t; i++) state.addends.push(i);
-        }
+        if (state.targets.includes(t)) state.targets = state.targets.filter(x => x !== t);
+        else state.targets = state.targets.concat(t).sort((a,b) => a - b);
+        if (state.targets.length === 0) state.targets = [t]; // never let it be empty
         saveSettings();
         renderTargets();
-        renderAddends();
       };
-      c.appendChild(b);
-    }
-  }
-
-  // Addends 1..target-1
-  function renderAddends() {
-    const c = $('addendButtons');
-    c.innerHTML = '';
-    for (let n = 1; n <= 9; n++) {
-      const b = document.createElement('button');
-      b.type = 'button';
-      if (n >= state.target) {
-        b.className = 'add-btn disabled';
-        b.textContent = n;
-        b.disabled = true;
-      } else {
-        b.className = 'add-btn' + (state.addends.includes(n) ? ' active' : '');
-        b.textContent = n;
-        b.onclick = () => {
-          if (state.addends.includes(n)) state.addends = state.addends.filter(x => x !== n);
-          else state.addends = state.addends.concat(n).sort((a,b) => a - b);
-          saveSettings();
-          renderAddends();
-        };
-      }
       c.appendChild(b);
     }
   }
@@ -653,17 +592,11 @@ body {
   document.querySelectorAll('.preset-btn').forEach(b => {
     b.onclick = () => {
       const p = b.dataset.preset;
-      const all = [];
-      for (let i = 1; i < state.target; i++) all.push(i);
-      if (p === 'all') state.addends = all;
-      else if (p === 'hard') {
-        // "Hard" = upper half of addends
-        const half = Math.ceil((state.target - 1) / 2);
-        state.addends = all.filter(n => n > half);
-        if (state.addends.length === 0) state.addends = all;
-      }
+      if (p === 'all') state.targets = [2,3,4,5,6,7,8,9,10];
+      else if (p === 'easy') state.targets = [2,3,4,5];
+      else if (p === 'hard') state.targets = [6,7,8,9,10];
       saveSettings();
-      renderAddends();
+      renderTargets();
     };
   });
 
@@ -688,21 +621,21 @@ body {
 
   // Start
   $('startBtn').onclick = () => {
-    if (state.addends.length === 0) {
-      alert('Выбери хотя бы одно первое слагаемое');
+    if (state.targets.length === 0) {
+      alert('Выбери хотя бы одно число');
       return;
     }
     startGame();
   };
 
   function generateQuestions() {
+    // Cross-product of all selected targets × all valid first-addends.
     let qs = [];
-    for (const a of state.addends) {
-      qs.push({ a: a, target: state.target });
+    for (const t of state.targets) {
+      for (let a = 1; a < t; a++) qs.push({ a: a, target: t });
     }
     if (state.mode === 'random') qs = shuffle(qs);
     if (state.count !== 'all') {
-      // Tile/repeat to fill the count
       const needed = state.count;
       let out = [];
       while (out.length < needed) {
@@ -844,16 +777,19 @@ body {
   $('studyBtn').onclick = () => {
     const cont = $('studyContent');
     cont.innerHTML = '';
-    const col = document.createElement('div');
-    col.className = 'study-col';
-    col.innerHTML = `<h3>Состав числа ${state.target}</h3>`;
-    for (let i = 1; i < state.target; i++) {
-      const row = document.createElement('div');
-      row.className = 'study-row';
-      row.innerHTML = `<span>${i} + ${state.target - i}</span><span>= ${state.target}</span>`;
-      col.appendChild(row);
-    }
-    cont.appendChild(col);
+    const ts = state.targets.length ? state.targets : [10];
+    ts.forEach(t => {
+      const col = document.createElement('div');
+      col.className = 'study-col';
+      col.innerHTML = `<h3>Состав числа ${t}</h3>`;
+      for (let i = 1; i < t; i++) {
+        const row = document.createElement('div');
+        row.className = 'study-row';
+        row.innerHTML = `<span>${i} + ${t - i}</span><span>= ${t}</span>`;
+        col.appendChild(row);
+      }
+      cont.appendChild(col);
+    });
     show('screen-study');
   };
 
@@ -885,7 +821,6 @@ body {
 
   // Init
   renderTargets();
-  renderAddends();
 })();
 </script>
 </body>
